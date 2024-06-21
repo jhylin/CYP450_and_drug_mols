@@ -1,0 +1,48 @@
+---
+title: "Cytochrome P450 and small molecules"
+author: Jennifer HY Lin
+date: '2024-6-21'
+draft: true
+categories: 
+    - Toxicology
+    - RDKit
+    - ChEMBL database
+    - Python
+jupyter: python3
+format: html
+bibliography: references.bib
+---
+
+Something about drug toxicology.
+
+Seems to involve (in a very rough sense) 3 main types: structural alerts (in relation to known adverse effects or PAINs), Human ether-a-go-go-related gene (hERG) potassium channel and cytochrome P450 (CYP450) enzymes. There are most likely more as well (need to look further into).
+
+Recent commentary that mentions about "avoidome" - "Structure is beauty, but not always truth" (cite: https://doi.org/10.1016/j.cell.2024.01.003) - DMPK-related proteins to avoid
+
+Many have looked into structural alerts (one example repo - rd_filters). ChEMBL database also has a cheminformatic utils web service that provides structural alert computation for compounds. There are most likely many more (probably need to search for more).
+
+hERG potassium channel is also another frequently-looked aspect for drug toxicology due to its effect on cardiac QT prolongation.
+
+CYP450 enzymes also play a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there is anything interesting for further explorations.
+
+*Flockhart table*
+
+```{python}
+## Trialling chembl_web_resource client
+## if not suitable, probably back to chembl_downloader or other ways
+
+# Trying to get some chemical structures of approved drugs
+from chembl_webresource_client.new_client import new_client
+
+molecule = new_client.molecule
+mols = molecule.filter(pref_name__iexact='aspirin').only('molecule_structures')
+mols
+```
+
+```{python}
+type(mols)
+```
+
+```{python}
+list(mols)
+```
