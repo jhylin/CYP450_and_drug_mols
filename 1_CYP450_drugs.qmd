@@ -1,7 +1,7 @@
 ---
 title: "Cytochrome P450 and small molecules"
 author: Jennifer HY Lin
-date: '2024-6-21'
+date: '2024-6-24'
 draft: true
 categories: 
     - Toxicology
@@ -25,24 +25,39 @@ hERG potassium channel is also another frequently-looked aspect for drug toxicol
 
 CYP450 enzymes also play a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there is anything interesting for further explorations.
 
-*Flockhart table*
+##### **Extracting data**
 
 ```{python}
-## Trialling chembl_web_resource client
-## if not suitable, probably back to chembl_downloader or other ways
-
-# Trying to get some chemical structures of approved drugs
-from chembl_webresource_client.new_client import new_client
-
-molecule = new_client.molecule
-mols = molecule.filter(pref_name__iexact='aspirin').only('molecule_structures')
-mols
+import chembl_downloader
+from chembl_downloader import latest
 ```
 
 ```{python}
-type(mols)
+# Latest version of ChEMBL
+latest_version = latest()
+print(f"The latest ChEMBL version is: {latest_version}")
 ```
 
+I'm using SQL via chembl_downloader again to download approved drugs with their ChEMBL ID and equivalent canonical SMILES. All of the CYP3A4 inhibitors extracted from ChEMBL are based on the [Flockhart table of drug interactions](https://drug-interactions.medicine.iu.edu/MainTable.aspx).
+
 ```{python}
-list(mols)
+sql = """
+SELECT
+    MOLECULE_DICTIONARY.chembl_id,
+    MOLECULE_DICTIONARY.pref_name,
+    MOLECULE_DICTIONARY.max_phase,
+    COMPOUND_STRUCTURES.canonical_smiles
+FROM MOLECULE_DICTIONARY
+JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno
+WHERE molecule_dictionary.pref_name IN ("CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE")
+"""
+
+# default query uses the latest ChEMBL version
+df_3a4_inh = chembl_downloader.query(sql)
+#df.to_csv(..., sep='\t', index=False)
+df_3a4_inh
 ```
+
+###### **Strong inhibitors of CYP3A4/5**
+
+This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochrome inhibitors. When a drug behaves like a cytochrome inhibitor, it inhibits the activity of a particular cytochrome enzyme e.g. CYP3A4 leading to a reduction of clearance of a particular therapeutic drug e.g. a CYP3A4 substrate such as apixaban, thus increasing its plasma concentration in vivo causing higher chance of adverse effect (which in the context of apixaban, this means the poor person who's taken apixaban may get excessive bleeding!).
