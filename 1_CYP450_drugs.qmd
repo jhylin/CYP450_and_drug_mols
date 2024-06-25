@@ -40,8 +40,12 @@ print(f"The latest ChEMBL version is: {latest_version}")
 
 I'm using SQL via chembl_downloader again to download approved drugs with their ChEMBL ID and equivalent canonical SMILES. All of the CYP3A4 inhibitors extracted from ChEMBL are based on the [Flockhart table of drug interactions](https://drug-interactions.medicine.iu.edu/MainTable.aspx).
 
+###### **Strong CYP3A4/5 inhibitors**
+
+This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochrome inhibitors. When a drug behaves like a cytochrome inhibitor, it inhibits the activity of a particular cytochrome enzyme e.g. CYP3A4 leading to a reduction of clearance of a particular therapeutic drug e.g. a CYP3A4 substrate such as apixaban, thus increasing its plasma concentration in vivo causing higher chance of adverse effect (which in the context of apixaban, this means the poor person who's taken apixaban may get excessive bleeding!).
+
 ```{python}
-sql = """
+sql_strong = """
 SELECT
     MOLECULE_DICTIONARY.chembl_id,
     MOLECULE_DICTIONARY.pref_name,
@@ -53,11 +57,36 @@ WHERE molecule_dictionary.pref_name IN ("CERITINIB", "CLARITHROMYCIN", "DELAVIRI
 """
 
 # default query uses the latest ChEMBL version
-df_3a4_inh = chembl_downloader.query(sql)
+df_3a4_strong_inh = chembl_downloader.query(sql_strong)
 #df.to_csv(..., sep='\t', index=False)
-df_3a4_inh
+df_3a4_strong_inh
 ```
 
-###### **Strong inhibitors of CYP3A4/5**
+###### **Moderate CYP3A4/5 inhibitors**
 
-This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochrome inhibitors. When a drug behaves like a cytochrome inhibitor, it inhibits the activity of a particular cytochrome enzyme e.g. CYP3A4 leading to a reduction of clearance of a particular therapeutic drug e.g. a CYP3A4 substrate such as apixaban, thus increasing its plasma concentration in vivo causing higher chance of adverse effect (which in the context of apixaban, this means the poor person who's taken apixaban may get excessive bleeding!).
+```{python}
+# skipping grapefruit juice as it's not quite an approved drug...
+# note: amlodipine inhibits cyp3a5
+
+sql_mod = """
+SELECT
+    MOLECULE_DICTIONARY.chembl_id,
+    MOLECULE_DICTIONARY.pref_name,
+    MOLECULE_DICTIONARY.max_phase,
+    COMPOUND_STRUCTURES.canonical_smiles
+FROM MOLECULE_DICTIONARY
+JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno
+WHERE molecule_dictionary.pref_name IN ("AMLODIPINE", "APREPITANT", "CIPROFLOXACIN", "CRIZOTINIB", "DILTIAZEM", "ERYTHROMYCIN", "FLUCONAZOLE", "IMATINIB", "LETERMOVIR", "NETUPITANT", "VERAPAMIL")
+"""
+
+# default query uses the latest ChEMBL version
+df_3a4_mod_inh = chembl_downloader.query(sql_mod)
+#df.to_csv(..., sep='\t', index=False)
+df_3a4_mod_inh
+```
+
+*?probably need better sql to get data*
+
+Another way is to use get_target_sql(), e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked for the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an example link for CYP2D6 in ChEMBL - https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D). The Flockhart table clearly annotated each approved drug with journal paper citations to show source, so likely going to stick with the SQL way here.
+
+###### **Strong CYP2D6 inhibitors**
