@@ -60,7 +60,7 @@ WHERE molecule_dictionary.pref_name IN ("CERITINIB", "CLARITHROMYCIN", "DELAVIRI
 
 # default query uses the latest ChEMBL version
 df_3a4_strong_inh = chembl_downloader.query(sql_strong)
-#df.to_csv(..., sep='\t', index=False)
+df_3a4_strong_inh.to_csv("strong_3a4_inh.csv", sep='\t', index=False)
 df_3a4_strong_inh
 ```
 
@@ -81,9 +81,8 @@ JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.
 WHERE molecule_dictionary.pref_name IN ("AMLODIPINE", "APREPITANT", "CIPROFLOXACIN", "CRIZOTINIB", "DILTIAZEM", "ERYTHROMYCIN", "FLUCONAZOLE", "IMATINIB", "LETERMOVIR", "NETUPITANT", "VERAPAMIL")
 """
 
-# default query uses the latest ChEMBL version
 df_3a4_mod_inh = chembl_downloader.query(sql_mod)
-#df.to_csv(..., sep='\t', index=False)
+df_3a4_mod_inh.to_csv("mod_3a4_inh.csv", sep='\t', index=False)
 df_3a4_mod_inh
 ```
 
@@ -98,12 +97,11 @@ SELECT
     COMPOUND_STRUCTURES.canonical_smiles
 FROM MOLECULE_DICTIONARY
 JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno
-WHERE molecule_dictionary.pref_name IN ("BUPROPRION", "FLUOXETINE", "PAROXETINE", "QUINIDINE")
+WHERE molecule_dictionary.pref_name IN ("BUPROPION", "FLUOXETINE", "PAROXETINE", "QUINIDINE")
 """
 
-# default query uses the latest ChEMBL version
 df_2d6_strong_inh = chembl_downloader.query(sql_2d6_strong)
-#df.to_csv(..., sep='\t', index=False)
+df_2d6_strong_inh.to_csv("strong_2d6_inh.csv", sep='\t', index=False)
 df_2d6_strong_inh
 ```
 
@@ -121,9 +119,8 @@ JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.
 WHERE molecule_dictionary.pref_name IN ("ABIRATERONE", "CINACALCET", "CLOBAZAM", "DOXEPIN", "DULOXETINE", "HALOFANTRINE", "LORCASERIN", "MOCLOBEMIDE", "ROLAPITANT", "TERBINAFINE")
 """
 
-# default query uses the latest ChEMBL version
 df_2d6_mod_inh = chembl_downloader.query(sql_2d6_mod)
-#df.to_csv(..., sep='\t', index=False)
+df_2d6_mod_inh.to_csv("mod_2d6_inh.csv", sep='\t', index=False)
 df_2d6_mod_inh
 ```
 
