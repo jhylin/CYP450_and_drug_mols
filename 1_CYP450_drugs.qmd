@@ -46,7 +46,7 @@ A bit about retrieving data here, the following might not be the best way to get
 
 This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochrome inhibitors. When a drug behaves like a cytochrome inhibitor, it inhibits the activity of a particular cytochrome enzyme e.g. CYP3A4 leading to a reduction of clearance of a particular therapeutic drug e.g. a CYP3A4 substrate such as apixaban, thus increasing its plasma concentration in vivo causing higher chance of adverse effect (which in the context of apixaban, this means the poor person who's taken apixaban may get excessive bleeding!).
 
-```{python}
+```{{python}}
 sql_strong = """
 SELECT
     MOLECULE_DICTIONARY.chembl_id,
@@ -66,7 +66,7 @@ df_3a4_strong_inh
 
 ###### **Moderate CYP3A4/5 inhibitors**
 
-```{python}
+```{{python}}
 # skipping grapefruit juice as it's not quite an approved drug...
 # note: amlodipine inhibits cyp3a5
 
@@ -88,7 +88,7 @@ df_3a4_mod_inh
 
 ###### **Strong CYP2D6 inhibitors**
 
-```{python}
+```{{python}}
 sql_2d6_strong = """
 SELECT
     MOLECULE_DICTIONARY.chembl_id,
@@ -107,7 +107,7 @@ df_2d6_strong_inh
 
 ###### **Moderate CYP2D6 inhibitors**
 
-```{python}
+```{{python}}
 sql_2d6_mod = """
 SELECT
     MOLECULE_DICTIONARY.chembl_id,
@@ -124,14 +124,16 @@ df_2d6_mod_inh.to_csv("mod_2d6_inh.tsv", sep='\t', index=False)
 df_2d6_mod_inh
 ```
 
+##### **Import and preprocess data**
+
 * Will look at the two largest group of CYP inhibitors first (may need to include substrates and inducers too - depends on how this will go...)
 
 * Any interesting molecular motifs/substructures?
 
 
 ```{python}
-# May need to update old script "mol_prep.py" 
+# Import tsv files instead
 
-# Preprocess canonical smiles 
+# May need to update old script "mol_prep.py" - preprocess canonical smiles 
 
 ```
