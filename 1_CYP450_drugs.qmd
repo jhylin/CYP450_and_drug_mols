@@ -1,7 +1,7 @@
 ---
 title: "Cytochrome P450 and small molecules"
 author: Jennifer HY Lin
-date: '2024-6-26'
+date: '2024-6-27'
 draft: true
 categories: 
     - Toxicology
@@ -60,7 +60,7 @@ WHERE molecule_dictionary.pref_name IN ("CERITINIB", "CLARITHROMYCIN", "DELAVIRI
 
 # default query uses the latest ChEMBL version
 df_3a4_strong_inh = chembl_downloader.query(sql_strong)
-df_3a4_strong_inh.to_csv("strong_3a4_inh.csv", sep='\t', index=False)
+df_3a4_strong_inh.to_csv("strong_3a4_inh.tsv", sep='\t', index=False)
 df_3a4_strong_inh
 ```
 
