@@ -82,7 +82,7 @@ WHERE molecule_dictionary.pref_name IN ("AMLODIPINE", "APREPITANT", "CIPROFLOXAC
 """
 
 df_3a4_mod_inh = chembl_downloader.query(sql_mod)
-df_3a4_mod_inh.to_csv("mod_3a4_inh.csv", sep='\t', index=False)
+df_3a4_mod_inh.to_csv("mod_3a4_inh.tsv", sep='\t', index=False)
 df_3a4_mod_inh
 ```
 
@@ -101,7 +101,7 @@ WHERE molecule_dictionary.pref_name IN ("BUPROPION", "FLUOXETINE", "PAROXETINE",
 """
 
 df_2d6_strong_inh = chembl_downloader.query(sql_2d6_strong)
-df_2d6_strong_inh.to_csv("strong_2d6_inh.csv", sep='\t', index=False)
+df_2d6_strong_inh.to_csv("strong_2d6_inh.tsv", sep='\t', index=False)
 df_2d6_strong_inh
 ```
 
@@ -120,7 +120,7 @@ WHERE molecule_dictionary.pref_name IN ("ABIRATERONE", "CINACALCET", "CLOBAZAM",
 """
 
 df_2d6_mod_inh = chembl_downloader.query(sql_2d6_mod)
-df_2d6_mod_inh.to_csv("mod_2d6_inh.csv", sep='\t', index=False)
+df_2d6_mod_inh.to_csv("mod_2d6_inh.tsv", sep='\t', index=False)
 df_2d6_mod_inh
 ```
 
