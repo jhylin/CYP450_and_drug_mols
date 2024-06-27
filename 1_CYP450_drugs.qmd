@@ -17,7 +17,7 @@ Something about drug toxicology.
 
 Seems to involve (in a very rough sense) 3 main types: structural alerts (in relation to known adverse effects or PAINs), Human ether-a-go-go-related gene (hERG) potassium channel and cytochrome P450 (CYP450) enzymes. There are most likely more as well (need to look further into).
 
-Recent commentary that mentions about "avoidome" - "Structure is beauty, but not always truth" (cite: https://doi.org/10.1016/j.cell.2024.01.003) - DMPK-related proteins to avoid
+Recent commentary that mentions about "avoidome" - "Structure is beauty, but not always truth" (cite: https://doi.org/10.1016/j.cell.2024.01.003) - DMPK-related proteins to avoid - also mentioned two other blog posts which have reviewed this commentary recently (interesting view points).
 
 Many have looked into structural alerts (one example repo - rd_filters). ChEMBL database also has a cheminformatic utils web service that provides structural alert computation for compounds. There are most likely many more (probably need to search for more).
 
@@ -124,5 +124,14 @@ df_2d6_mod_inh.to_csv("mod_2d6_inh.tsv", sep='\t', index=False)
 df_2d6_mod_inh
 ```
 
-* Will look at the two largest group of CYP inhibitors first
+* Will look at the two largest group of CYP inhibitors first (may need to include substrates and inducers too - depends on how this will go...)
+
 * Any interesting molecular motifs/substructures?
+
+
+```{python}
+# May need to update old script "mol_prep.py" 
+
+# Preprocess canonical smiles 
+
+```

@@ -1,0 +1,4 @@
+This repository attempts to look at cytochrome p450 (CYP) enzymes and their corresponding inhibitors currently, and hopefully with a bit more cheminformatics focus on these drug molecules. There may be possibilities to also look at their substrates and inducers, but I'm unsure how this little piece of work will evolve as I've only just started working on it. Current ETA is probably around July to August (aiming for third quarter of the year), depending on how in-depth I'm going to explore on this topic.
+
+A quick background on why I've started looking at this theme: CYP enzymes do play an important role in drug metabolism and toxicology if we're thinking about drug pharmacokinetics (e.g. absorption, distribution, metabolism, excretion and toxicology or ADMET). Potentially, it may assist the drug designing process during drug discovery projects. 
+
