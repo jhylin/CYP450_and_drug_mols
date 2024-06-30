@@ -17,7 +17,10 @@ Something about drug toxicology.
 
 Seems to involve (in a very rough sense) 3 main types: structural alerts (in relation to known adverse effects or PAINs), Human ether-a-go-go-related gene (hERG) potassium channel and cytochrome P450 (CYP450) enzymes. There are most likely more as well (need to look further into).
 
-Recent commentary that mentions about "avoidome" - "Structure is beauty, but not always truth" (cite: https://doi.org/10.1016/j.cell.2024.01.003) - DMPK-related proteins to avoid - also mentioned two other blog posts which have reviewed this commentary recently (interesting view points).
+Recent commentary that mentions about "avoidome" - "Structure is beauty, but not always truth" (cite: https://doi.org/10.1016/j.cell.2024.01.003) talks about DMPK-related proteins to avoid 
+- also mentioned two other blog posts which have reviewed this commentary recently (interesting view points)
+- https://www.science.org/content/blog-post/john-keats-would-word - D. Lowe
+- https://fbdd-lit.blogspot.com/2024/03/ - P. Kenny
 
 Many have looked into structural alerts (one example repo - rd_filters). ChEMBL database also has a cheminformatic utils web service that provides structural alert computation for compounds. There are most likely many more (probably need to search for more).
 
@@ -50,26 +53,29 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 *Moved data retrieval code to become a Python script (temporarily named as "cyp_drugs.py") instead (likely need to write it as a function code - too many users trying to connect to chembl, to try later)*
 
 ```{python}
-# from cyp_drugs import chembl_drugs
-# chembl_drugs("AMLODIPINE")
+# Managed to get all column headers but not data
+from cyp_drugs import chembl_drugs
+chembl_drugs('KETOCONAZOLE')
 ```
 
-```{python}
-# sql_strong = """
-# SELECT
-#     MOLECULE_DICTIONARY.chembl_id,
-#     MOLECULE_DICTIONARY.pref_name,
-#     MOLECULE_DICTIONARY.max_phase,
-#     COMPOUND_STRUCTURES.canonical_smiles
-# FROM MOLECULE_DICTIONARY
-# JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno
-# WHERE molecule_dictionary.pref_name IN ("CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE")
-# """
+*likely going to stick with original SQL*
 
-# # default query uses the latest ChEMBL version
-# df_3a4_strong_inh = chembl_downloader.query(sql_strong)
+```{python}
+sql_strong = """
+SELECT
+    MOLECULE_DICTIONARY.chembl_id,
+    MOLECULE_DICTIONARY.pref_name,
+    MOLECULE_DICTIONARY.max_phase,
+    COMPOUND_STRUCTURES.canonical_smiles
+FROM MOLECULE_DICTIONARY
+JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno
+WHERE molecule_dictionary.pref_name IN ("CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE")
+"""
+
+# default query uses the latest ChEMBL version
+df_3a4_strong_inh = chembl_downloader.query(sql_strong)
 # # df_3a4_strong_inh.to_csv("strong_3a4_inh.tsv", sep='\t', index=False)
-# df_3a4_strong_inh
+df_3a4_strong_inh
 ```
 
 ##### **Import and preprocess data**
@@ -94,12 +100,13 @@ df_s_3a4inh
 # similar issue with pandas as well - pandas latest release is 2.2.2 which is compatible with numpy 2 - to downgrade version as well
 
 # preprocess canonical smiles 
-from mol_prep import preprocess
-df_s_3a4inh = df_s_3a4inh.copy()
-df_s_3a4inh_p = df_s_3a4inh.apply(preprocess, axis=1)
-df_s_3a4inh_p
+# from mol_prep import preprocess
+# df_s_3a4inh = df_s_3a4inh.copy()
+# df_s_3a4inh_p = df_s_3a4inh.apply(preprocess, axis=1)
+# df_s_3a4inh_p
 
 # error msg - "module 'pandas.io.formats.format' has no attribute 'get_adjustment'" - could be to do with rdkit's pandastool """ Monkey patch an RDKit method of Chem.Mol and pandas """ where something's not right...
 
-# or convert the canonical_smiles into rdkit mols independently (not using preprocess function)
+# or convert the canonical_smiles into rdkit mols independently (not using preprocess function) 
+# PandasTools
 ```

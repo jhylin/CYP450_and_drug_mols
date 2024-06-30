@@ -1,8 +1,9 @@
 import chembl_downloader
 
-# work-in-progress
+# work-in-progress (might not use)
 
-def chembl_drugs(drug: str):
+
+def chembl_drugs(*drug):
 
     #drug_name = "" if drug is None else f"WHERE molecule_dictionary.pref_name IN '{drug}'"
 
@@ -14,13 +15,13 @@ def chembl_drugs(drug: str):
         COMPOUND_STRUCTURES.canonical_smiles
     FROM MOLECULE_DICTIONARY
     JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno 
-    WHERE molecule_dictionary.pref_name IN '{drug}'
+    WHERE molecule_dictionary.pref_name IN ('{drug}')
     """
 
     # default query uses the latest ChEMBL version
-    df_cyp_inh = chembl_downloader.query(sql)
+    df = chembl_downloader.query(sql)
     
-    return df_cyp_inh
+    return df
     # Save as .tsv files
     # df_cyp_inh.to_csv(f"{file_name}.tsv", sep='\t', index=False)
 
