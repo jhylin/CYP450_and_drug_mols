@@ -1,27 +1,34 @@
 import chembl_downloader
+from textwrap import dedent
+#import pandas as pd
 
-# work-in-progress (might not use)
+# work-in-progress
 
-
-def chembl_drugs(*drug):
+def chembl_drugs(*drug: str):
 
     #drug_name = "" if drug is None else f"WHERE molecule_dictionary.pref_name IN '{drug}'"
+    # str2 = str1.replace('\\', '') 
+    # sql string problem esp. for drug names!
 
-    sql = """
-    SELECT
-        MOLECULE_DICTIONARY.chembl_id,
-        MOLECULE_DICTIONARY.pref_name,
-        MOLECULE_DICTIONARY.max_phase,
-        COMPOUND_STRUCTURES.canonical_smiles
-    FROM MOLECULE_DICTIONARY
-    JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno 
-    WHERE molecule_dictionary.pref_name IN ('{drug}')
+    sql = dedent(
+        f"""\
+        SELECT
+            MOLECULE_DICTIONARY.chembl_id,
+            MOLECULE_DICTIONARY.pref_name,
+            MOLECULE_DICTIONARY.max_phase,
+            COMPOUND_STRUCTURES.canonical_smiles
+        FROM MOLECULE_DICTIONARY
+            JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno 
+        WHERE molecule_dictionary.pref_name = '{drug}'
     """
+    ).strip()
+
+    return sql
+
 
     # default query uses the latest ChEMBL version
-    df = chembl_downloader.query(sql)
-    
-    return df
+    #df = chembl_downloader.query(sql)
+
     # Save as .tsv files
     # df_cyp_inh.to_csv(f"{file_name}.tsv", sep='\t', index=False)
 

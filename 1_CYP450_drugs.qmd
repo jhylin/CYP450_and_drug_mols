@@ -54,8 +54,18 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 
 ```{python}
 # Managed to get all column headers but not data
+
+# Generating sql only!
 from cyp_drugs import chembl_drugs
-chembl_drugs('KETOCONAZOLE')
+#drugs = ("KETOCONAZOLE", "FLUCONAZOLE")
+sql_test = chembl_drugs("KETOCONAZOLE", "FLUCONAZOLE")
+
+## Main issue is with sql string - too many quotation marks!
+# WHERE molecule_dictionary.pref_name = '('KETOCONAZOLE', 'FLUCONAZOLE')'': near "KETOCONAZOLE": syntax error
+```
+
+```{python}
+df = chembl_downloader.query(sql_test)
 ```
 
 *likely going to stick with original SQL*
