@@ -38,55 +38,54 @@ from chembl_downloader import latest
 
 ```{python}
 # Latest version of ChEMBL
-# latest_version = latest()
-# print(f"The latest ChEMBL version is: {latest_version}")
+latest_version = latest()
+print(f"The latest ChEMBL version is: {latest_version}")
 ```
 
 I'm using SQL via chembl_downloader again to download approved drugs with their ChEMBL ID and equivalent canonical SMILES. All of the CYP3A4 inhibitors extracted from ChEMBL are based on the [Flockhart table of drug interactions](https://drug-interactions.medicine.iu.edu/MainTable.aspx).
 
-A bit about retrieving data here, the following might not be the best way to get the data, but I've resorted to simple SQL via using chembl_downloader's query(). Another possible way is to use get_target_sql(), e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an example link for CYP2D6 in ChEMBL - https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D). The Flockhart table has clearly annotated each approved drug with journal paper citations, so I'm going to stick with the SQL way here.
+A bit about retrieving data here, the following might not be the best way to get the data, but I've somehow incorporated chembl_downloader into my own small piece of function code to retrieve SMILES of approved drugs. Earlier on, I was repeating SQL queries and thought to improve them by using a function code instead - see Python script named as "cyp_drugs.py". It removes a large chunk of SQL query string every time when trying to get different CYP inhibitors, leaving only approved drug names so it's easier to read and understand.
+
+Another possible way is to use get_target_sql(), e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an example link for CYP2D6 in ChEMBL - https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D). The Flockhart table has clearly annotated each approved drug with journal paper citations, so I'm going to stick the following method for now.
+
+```{python}
+## Main issue previously was with sql string - too many quotation marks!
+# e.g. WHERE molecule_dictionary.pref_name = '('KETOCONAZOLE', 'FLUCONAZOLE')'': near "KETOCONAZOLE": syntax error
+# Resolved by adding string methods e.g. strip() and replace() to sql query string
+# function code used chembl_downloader code as reference since it has no particular function to select drugs this way yet
+from cyp_drugs import chembl_drugs
+
+# Get a list of strong cyp3a4 inhibitors
+# and save as a tsv file
+df_3a4_strong_inh = chembl_drugs("CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE", file_name="strong_3a4_inh")
+df_3a4_strong_inh
+```
+
+```{python}
+## Get a list of moderate cyp3a4 inhibitors
+# skipping grapefruit juice as it's not quite an approved drug...
+# note: amlodipine inhibits cyp3a5
+df_3a4_mod_inh = chembl_drugs("AMLODIPINE", "APREPITANT", "CIPROFLOXACIN", "CRIZOTINIB", "DILTIAZEM", "ERYTHROMYCIN", "FLUCONAZOLE", "IMATINIB", "LETERMOVIR", "NETUPITANT", "VERAPAMIL", file_name="mod_3a4_inh")
+df_3a4_mod_inh
+```
+
+```{python}
+# Get a list of strong cyp2d6 inhibitors
+df_2d6_strong_inh = chembl_drugs("BUPROPION", "FLUOXETINE", "PAROXETINE", "QUINIDINE", file_name="strong_2d6_inh")
+df_2d6_strong_inh
+```
+
+```{python}
+# Get a list of moderate cyp2d6 inhibitors
+df_2d6_mod_inh = chembl_drugs("ABIRATERONE", "CINACALCET", "CLOBAZAM", "DOXEPIN", "DULOXETINE", "HALOFANTRINE", "LORCASERIN", "MOCLOBEMIDE", "ROLAPITANT", "TERBINAFINE", file_name="mod_2d6_inh")
+df_2d6_mod_inh
+```
 
 Initially, four categories of approved drugs are retrieved - strong CYP3A4/5 inhibitors, moderate CYP3A4/5 inhibitors, strong CYP2D6 inhibitors and moderate CYP2D6 inhibitors.
 
 This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochrome inhibitors. When a drug behaves like a cytochrome inhibitor, it inhibits the activity of a particular cytochrome enzyme e.g. CYP3A4 leading to a reduction of clearance of a particular therapeutic drug e.g. a CYP3A4 substrate such as apixaban, thus increasing its plasma concentration in vivo causing higher chance of adverse effect (which in the context of apixaban, this means the poor person who's taken apixaban may get excessive bleeding!).
 
-*Moved data retrieval code to become a Python script (temporarily named as "cyp_drugs.py") instead (likely need to write it as a function code - too many users trying to connect to chembl, to try later)*
-
-```{python}
-# Managed to get all column headers but not data
-
-# Generating sql only!
-from cyp_drugs import chembl_drugs
-#drugs = ("KETOCONAZOLE", "FLUCONAZOLE")
-sql_test = chembl_drugs("KETOCONAZOLE", "FLUCONAZOLE")
-
-## Main issue is with sql string - too many quotation marks!
-# WHERE molecule_dictionary.pref_name = '('KETOCONAZOLE', 'FLUCONAZOLE')'': near "KETOCONAZOLE": syntax error
-```
-
-```{python}
-df = chembl_downloader.query(sql_test)
-```
-
-*likely going to stick with original SQL*
-
-```{python}
-sql_strong = """
-SELECT
-    MOLECULE_DICTIONARY.chembl_id,
-    MOLECULE_DICTIONARY.pref_name,
-    MOLECULE_DICTIONARY.max_phase,
-    COMPOUND_STRUCTURES.canonical_smiles
-FROM MOLECULE_DICTIONARY
-JOIN COMPOUND_STRUCTURES ON MOLECULE_DICTIONARY.molregno == COMPOUND_STRUCTURES.molregno
-WHERE molecule_dictionary.pref_name IN ("CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE")
-"""
-
-# default query uses the latest ChEMBL version
-df_3a4_strong_inh = chembl_downloader.query(sql_strong)
-# # df_3a4_strong_inh.to_csv("strong_3a4_inh.tsv", sep='\t', index=False)
-df_3a4_strong_inh
-```
+<br>
 
 ##### **Import and preprocess data**
 
@@ -97,8 +96,8 @@ df_3a4_strong_inh
 ```{python}
 # Import tsv files instead
 # Strong cyp3a4 inhibitors
-df_s_3a4inh = pd.read_csv("strong_3a4_inh.tsv", sep="\t")
-df_s_3a4inh
+# df_s_3a4inh = pd.read_csv("strong_3a4_inh.tsv", sep="\t")
+# df_s_3a4inh
 ```
 
 
