@@ -1,7 +1,7 @@
 ---
 title: "Cytochrome P450 and small molecules"
 author: Jennifer HY Lin
-date: '2024-6-28'
+date: '2024-7-3'
 draft: true
 categories: 
     - Toxicology
@@ -57,7 +57,10 @@ from cyp_drugs import chembl_drugs
 
 # Get a list of strong cyp3a4 inhibitors
 # and save as a tsv file
-df_3a4_strong_inh = chembl_drugs("CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE", file_name="strong_3a4_inh")
+df_3a4_strong_inh = chembl_drugs(
+    "CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE",
+    #file_name="strong_3a4_inh"
+    )
 df_3a4_strong_inh
 ```
 
@@ -65,19 +68,27 @@ df_3a4_strong_inh
 ## Get a list of moderate cyp3a4 inhibitors
 # skipping grapefruit juice as it's not quite an approved drug...
 # note: amlodipine inhibits cyp3a5
-df_3a4_mod_inh = chembl_drugs("AMLODIPINE", "APREPITANT", "CIPROFLOXACIN", "CRIZOTINIB", "DILTIAZEM", "ERYTHROMYCIN", "FLUCONAZOLE", "IMATINIB", "LETERMOVIR", "NETUPITANT", "VERAPAMIL", file_name="mod_3a4_inh")
+df_3a4_mod_inh = chembl_drugs(
+    "AMLODIPINE", "APREPITANT", "CIPROFLOXACIN", "CRIZOTINIB", "DILTIAZEM", "ERYTHROMYCIN", "FLUCONAZOLE", "IMATINIB", "LETERMOVIR", "NETUPITANT", "VERAPAMIL", #file_name="mod_3a4_inh"
+    )
 df_3a4_mod_inh
 ```
 
 ```{python}
 # Get a list of strong cyp2d6 inhibitors
-df_2d6_strong_inh = chembl_drugs("BUPROPION", "FLUOXETINE", "PAROXETINE", "QUINIDINE", file_name="strong_2d6_inh")
+df_2d6_strong_inh = chembl_drugs(
+    "BUPROPION", "FLUOXETINE", "PAROXETINE", "QUINIDINE", 
+    #file_name="strong_2d6_inh"
+    )
 df_2d6_strong_inh
 ```
 
 ```{python}
 # Get a list of moderate cyp2d6 inhibitors
-df_2d6_mod_inh = chembl_drugs("ABIRATERONE", "CINACALCET", "CLOBAZAM", "DOXEPIN", "DULOXETINE", "HALOFANTRINE", "LORCASERIN", "MOCLOBEMIDE", "ROLAPITANT", "TERBINAFINE", file_name="mod_2d6_inh")
+df_2d6_mod_inh = chembl_drugs(
+    "ABIRATERONE", "CINACALCET", "CLOBAZAM", "DOXEPIN", "DULOXETINE", "HALOFANTRINE", "LORCASERIN", "MOCLOBEMIDE", "ROLAPITANT", "TERBINAFINE", 
+    #file_name="mod_2d6_inh"
+    )
 df_2d6_mod_inh
 ```
 
@@ -97,7 +108,7 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 # Using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 (all latest versions)
 
 # Seems to work as a new df is generated but with some error messages shown though
-
+# ---error message---
 # A module that was compiled using NumPy 1.x cannot be run in
 # NumPy 2.0.0 as it may crash. To support both 1.x and 2.x
 # versions of NumPy, modules must be compiled with NumPy 2.0.

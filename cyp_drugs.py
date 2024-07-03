@@ -1,11 +1,12 @@
 import chembl_downloader
 from textwrap import dedent
+from typing import Optional
 
-def chembl_drugs(*drug: str, file_name: str):
+def chembl_drugs(*drug: str, file_name: Optional[str] = None):
 
     """
     Obtain approved drugs' ChEMBL IDs, generic drug names, max phases and canonical SMILES
-    via using drug names only and saving dataframe as tsv files
+    via using drug names only with an option to save dataframe as tsv files
     """
 
     # dedent to remove leading whitespaces from every line
@@ -25,7 +26,10 @@ def chembl_drugs(*drug: str, file_name: str):
 
     # default query uses the latest ChEMBL version
     df = chembl_downloader.query(sql)
-    # save df as .tsv files
-    df.to_csv(f"{file_name}.tsv", sep='\t', index=False)
 
-    return df
+    if file_name == None:
+        return df
+    else:
+        # save df as .tsv files if a file name is added
+        df.to_csv(f"{file_name}.tsv", sep='\t', index=False)
+        return df
