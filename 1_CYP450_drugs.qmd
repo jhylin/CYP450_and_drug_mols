@@ -94,28 +94,32 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 * Any interesting molecular motifs/substructures?
 
 ```{python}
-# Import tsv files instead
-# Strong cyp3a4 inhibitors
-# df_s_3a4inh = pd.read_csv("strong_3a4_inh.tsv", sep="\t")
-# df_s_3a4inh
+# Using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 (all latest versions)
+
+# Seems to work as a new df is generated but with some error messages shown though
+
+# A module that was compiled using NumPy 1.x cannot be run in
+# NumPy 2.0.0 as it may crash. To support both 1.x and 2.x
+# versions of NumPy, modules must be compiled with NumPy 2.0.
+# Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
+
+# If you are a user of the module, the easiest solution will be to
+# downgrade to 'numpy<2' or try to upgrade the affected module.
+# We expect that some modules will need time to support NumPy 2.
+
+
+# ?try using pip-tools to see if it helps
+
+# preprocess canonical smiles 
+from mol_prep import preprocess
+df_3a4_strong_inh = df_3a4_strong_inh.copy()
+df_3a4_strong_inh_p = df_3a4_strong_inh.apply(preprocess, axis=1)
+df_3a4_strong_inh_p
 ```
 
 
 ```{python}
-# Need to update old script "mol_prep.py", esp. on preprocess code, due to recent numpy update! 
-
-# downgrade to numpy 1.26.0 as rdkit's numpy 2 patch is likely going to be included in the next release only (GitHub issue: https://github.com/rdkit/rdkit/pull/7531)
-
-# similar issue with pandas as well - pandas latest release is 2.2.2 which is compatible with numpy 2 - to downgrade version as well
-
-# preprocess canonical smiles 
-# from mol_prep import preprocess
-# df_s_3a4inh = df_s_3a4inh.copy()
-# df_s_3a4inh_p = df_s_3a4inh.apply(preprocess, axis=1)
-# df_s_3a4inh_p
-
-# error msg - "module 'pandas.io.formats.format' has no attribute 'get_adjustment'" - could be to do with rdkit's pandastool """ Monkey patch an RDKit method of Chem.Mol and pandas """ where something's not right...
-
 # or convert the canonical_smiles into rdkit mols independently (not using preprocess function) 
 # PandasTools
+# Check structure validities
 ```

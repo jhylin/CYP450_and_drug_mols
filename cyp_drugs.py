@@ -3,7 +3,9 @@ from textwrap import dedent
 
 def chembl_drugs(*drug: str, file_name: str):
 
-    """Obtain approved drugs' ChEMBL IDs, generic drug names, max phases and canonical SMILES
+    """
+    Obtain approved drugs' ChEMBL IDs, generic drug names, max phases and canonical SMILES
+    via using drug names only and saving dataframe as tsv files
     """
 
     # dedent to remove leading whitespaces from every line
