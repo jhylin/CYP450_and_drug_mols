@@ -105,34 +105,67 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 * Any interesting molecular motifs/substructures?
 
 ```{python}
-# Using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 (all latest versions)
-
+## Tried using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 (all latest major versions, note: rdkit has a latest minor release as 2024.03.4, which includes a patch for numpy 2.0)
 # Seems to work as a new df is generated but with some error messages shown though
 # ---error message---
 # A module that was compiled using NumPy 1.x cannot be run in
 # NumPy 2.0.0 as it may crash. To support both 1.x and 2.x
 # versions of NumPy, modules must be compiled with NumPy 2.0.
 # Some module may need to rebuild instead e.g. with 'pybind11>=2.12'.
-
 # If you are a user of the module, the easiest solution will be to
 # downgrade to 'numpy<2' or try to upgrade the affected module.
 # We expect that some modules will need time to support NumPy 2.
 
-# 2 possible things to try:
-# download latest rdkit patch 2024.03.4
-# **downgrade pandas and numpy** - confirmed that it worked with pandas 2.1.4 & numpy 1.26.4 with no error messages as output
 
+## 2 other possible things to try:
+# download latest rdkit patch 2024.03.4 (will look into?) or
+# downgrade pandas and numpy - confirmed that it worked with pandas 2.1.4 & numpy 1.26.4 with no error messages as output
 
 # preprocess canonical smiles 
 from mol_prep import preprocess
-df_3a4_strong_inh = df_3a4_strong_inh.copy()
-df_3a4_strong_inh_p = df_3a4_strong_inh.apply(preprocess, axis=1)
-df_3a4_strong_inh_p
+
+# cyp3a4 strong inhibitors
+df_3a4_s_inh = df_3a4_strong_inh.copy()
+df_3a4_s_inh_p = df_3a4_s_inh.apply(preprocess, axis=1)
+df_3a4_s_inh_p
+```
+
+```{python}
+# cyp3a4 moderate inhibitors
+df_3a4_m_inh = df_3a4_mod_inh.copy()
+df_3a4_m_inh_p = df_3a4_m_inh.apply(preprocess, axis=1)
+df_3a4_m_inh_p
+```
+
+```{python}
+# cyp2d6 strong inhibitors
+df_2d6_s_inh = df_2d6_strong_inh.copy()
+df_2d6_s_inh_p = df_2d6_s_inh.apply(preprocess, axis=1)
+df_2d6_s_inh_p
+```
+
+```{python}
+#cyp2d6 moderate inhibitors
+df_2d6_m_inh = df_2d6_mod_inh.copy()
+df_2d6_m_inh_p = df_2d6_m_inh.apply(preprocess, axis=1)
+df_2d6_m_inh_p
+```
+
+```{python}
+from rdkit.Chem import Draw
+
+image_2d6_m_inh = Draw.MolsToGridImage(df_2d6_m_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_2d6_m_inh_p["pref_name"]))
+image_2d6_m_inh
 ```
 
 
 ```{python}
-# or convert the canonical_smiles into rdkit mols independently (not using preprocess function) 
-# PandasTools
+image_2d6_s_inh = Draw.MolsToGridImage(df_2d6_s_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_2d6_s_inh_p["pref_name"]))
+image_2d6_s_inh
+
+# Will need to check quinidine - two entries (may remove one?)
+```
+
+```{python}
 # Check structure validities
 ```
