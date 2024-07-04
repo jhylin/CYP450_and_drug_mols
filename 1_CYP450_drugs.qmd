@@ -1,7 +1,7 @@
 ---
 title: "Cytochrome P450 and small molecules"
 author: Jennifer HY Lin
-date: '2024-7-3'
+date: '2024-7-4'
 draft: true
 categories: 
     - Toxicology
@@ -46,7 +46,7 @@ I'm using SQL via chembl_downloader again to download approved drugs with their 
 
 A bit about retrieving data here, the following might not be the best way to get the data, but I've somehow incorporated chembl_downloader into my own small piece of function code to retrieve SMILES of approved drugs. Earlier on, I was repeating SQL queries and thought to improve them by using a function code instead - see Python script named as "cyp_drugs.py". It removes a large chunk of SQL query string every time when trying to get different CYP inhibitors, leaving only approved drug names so it's easier to read and understand.
 
-Another possible way is to use get_target_sql(), e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an example link for CYP2D6 in ChEMBL - https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D). The Flockhart table has clearly annotated each approved drug with journal paper citations, so I'm going to stick the following method for now.
+Another possible way is to use get_target_sql(), e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an example link for CYP2D6 in ChEMBL - https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D). The Flockhart table has clearly annotated each approved drug with journal paper citations, so I'm going to stick with the following method for now.
 
 ```{python}
 ## Main issue previously was with sql string - too many quotation marks!
@@ -118,8 +118,10 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 # downgrade to 'numpy<2' or try to upgrade the affected module.
 # We expect that some modules will need time to support NumPy 2.
 
+# 2 possible things to try:
+# download latest rdkit patch 2024.03.4
+# **downgrade pandas and numpy** - confirmed that it worked with pandas 2.1.4 & numpy 1.26.4 with no error messages as output
 
-# ?try using pip-tools to see if it helps
 
 # preprocess canonical smiles 
 from mol_prep import preprocess
