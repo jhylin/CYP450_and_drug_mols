@@ -1,7 +1,7 @@
 ---
 title: "Cytochrome P450 and small molecules"
 author: Jennifer HY Lin
-date: '2024-7-4'
+date: '2024-7-8'
 draft: true
 categories: 
     - Toxicology
@@ -28,6 +28,10 @@ hERG potassium channel is also another frequently-looked aspect for drug toxicol
 
 CYP450 enzymes also play a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there is anything interesting for further explorations.
 
+There is a nice background reading on the history involving CYP450 and their relevance to toxicities in drugs - https://doi.org/10.1007/s43188-020-00056-z. I don't think I can do a better job than this piece (or there may be more in the literatures) but this one sticks out for me at the time.
+
+<br>
+
 ##### **Extracting data**
 
 ```{python}
@@ -43,6 +47,8 @@ print(f"The latest ChEMBL version is: {latest_version}")
 ```
 
 I'm using SQL via chembl_downloader again to download approved drugs with their ChEMBL ID and equivalent canonical SMILES. All of the CYP3A4 inhibitors extracted from ChEMBL are based on the [Flockhart table of drug interactions](https://drug-interactions.medicine.iu.edu/MainTable.aspx).
+
+Note: Three other categories of medicines are not going to be looked at currently, which are the weak inhibitors, ones with in vitro evidence only and ones that are still pending reviews.
 
 A bit about retrieving data here, the following might not be the best way to get the data, but I've somehow incorporated chembl_downloader into my own small piece of function code to retrieve SMILES of approved drugs. Earlier on, I was repeating SQL queries and thought to improve them by using a function code instead - see Python script named as "cyp_drugs.py". It removes a large chunk of SQL query string every time when trying to get different CYP inhibitors, leaving only approved drug names so it's easier to read and understand.
 
@@ -127,14 +133,14 @@ from mol_prep import preprocess
 # cyp3a4 strong inhibitors
 df_3a4_s_inh = df_3a4_strong_inh.copy()
 df_3a4_s_inh_p = df_3a4_s_inh.apply(preprocess, axis=1)
-df_3a4_s_inh_p
+df_3a4_s_inh_p.head(3)
 ```
 
 ```{python}
 # cyp3a4 moderate inhibitors
 df_3a4_m_inh = df_3a4_mod_inh.copy()
 df_3a4_m_inh_p = df_3a4_m_inh.apply(preprocess, axis=1)
-df_3a4_m_inh_p
+df_3a4_m_inh_p.head()
 ```
 
 ```{python}
@@ -151,21 +157,77 @@ df_2d6_m_inh_p = df_2d6_m_inh.apply(preprocess, axis=1)
 df_2d6_m_inh_p
 ```
 
+##### **Images of structures**
+
+* Checking structural validities
+
 ```{python}
 from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole
+IPythonConsole.ipython_useSVG=True
 
+# 2d6 mod inhibitors
 image_2d6_m_inh = Draw.MolsToGridImage(df_2d6_m_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_2d6_m_inh_p["pref_name"]))
 image_2d6_m_inh
 ```
 
 
 ```{python}
+# 2d6 strong inhibitors
 image_2d6_s_inh = Draw.MolsToGridImage(df_2d6_s_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_2d6_s_inh_p["pref_name"]))
 image_2d6_s_inh
+```
 
-# Will need to check quinidine - two entries (may remove one?)
+* Will need to check quinidine - two entries
+* Noted different stereochem between the two quinidines (may remove the first one?)
+
+```{python}
+# 3a4 mod inhibitors
+image_3a4_m_inh = Draw.MolsToGridImage(df_3a4_m_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_3a4_m_inh_p["pref_name"]))
+image_3a4_m_inh
 ```
 
 ```{python}
-# Check structure validities
+# 3a4 strong inhibitors
+image_3a4_s_inh = Draw.MolsToGridImage(df_3a4_s_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_3a4_s_inh_p["pref_name"]))
+image_3a4_s_inh
 ```
+
+* Two itraconazoles to check - may need to remove one?
+* 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category
+* MCS might be interesting to look at in this group of strong 3A4 inhibitors
+
+```{python}
+# Check MCS first - may edit following code?
+
+## Following code borrowed from https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d by iwatobipen
+
+
+# from rdkit import Chem
+# from rdkit.Chem import Draw
+# from rdkit.Chem.Draw import IPythonConsole
+# from rdkit.Chem import rdFMCS
+# from rdkit.Chem.Draw import rdDepictor
+# rdDepictor.SetPreferCoordGen(True)
+# IPythonConsole.drawOptions.minFontSize=20
+
+
+# def view_difference(mol1, mol2):
+#     mcs = rdFMCS.FindMCS([mol1,mol2])
+#     mcs_mol = Chem.MolFromSmarts(mcs.smartsString)
+#     match1 = mol1.GetSubstructMatch(mcs_mol)
+#     target_atm1 = []
+#     for atom in mol1.GetAtoms():
+#         if atom.GetIdx() not in match1:
+#             target_atm1.append(atom.GetIdx())
+#     match2 = mol2.GetSubstructMatch(mcs_mol)
+#     target_atm2 = []
+#     for atom in mol2.GetAtoms():
+#         if atom.GetIdx() not in match2:
+#             target_atm2.append(atom.GetIdx())
+#     return Draw.MolsToGridImage([mol1, mol2],highlightAtomLists=[target_atm1, target_atm2])
+```
+
+
+
+?fragments and other things
