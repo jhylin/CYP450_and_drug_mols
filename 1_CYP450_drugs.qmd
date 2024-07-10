@@ -1,7 +1,7 @@
 ---
 title: "Cytochrome P450 and small molecules"
 author: Jennifer HY Lin
-date: '2024-7-8'
+date: '2024-7-10'
 draft: true
 categories: 
     - Toxicology
@@ -162,6 +162,7 @@ df_2d6_m_inh_p
 * Checking structural validities
 
 ```{python}
+from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem.Draw import IPythonConsole
 IPythonConsole.ipython_useSVG=True
@@ -179,7 +180,72 @@ image_2d6_s_inh
 ```
 
 * Will need to check quinidine - two entries
-* Noted different stereochem between the two quinidines (may remove the first one?)
+* Noted different **stereochem** between the two quinidines (may remove the first one?)
+
+```{python}
+# Some stereochemistries
+# Older approach - AssignStereochemistry() -> this is used in datamol's standardize_mol()
+# Newer approach - FindPotentialStereo()
+```
+
+```{python}
+df_2d6_s_inh_p.loc[3, "rdkit_mol"]
+```
+
+An 2D image of quinine was shown as output
+
+```{python}
+df_2d6_s_inh_p.loc[4, "rdkit_mol"]
+```
+
+```{python}
+df_2d6_s_inh_p.loc[3, "canonical_smiles"]
+```
+
+```{python}
+df_2d6_s_inh_p.loc[4, "canonical_smiles"]
+```
+
+```{python}
+from rdkit import Chem
+from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole
+IPythonConsole.ipython_useSVG=True
+IPythonConsole.drawOptions.addAtomIndices = False
+IPythonConsole.drawOptions.addStereoAnnotation = True
+
+# Testing single molecules - quinidine (index row 3)
+
+quinidine_3 = Chem.MolFromSmiles('C=C[C@H]1CN2CCC1C[C@@H]2[C@@H](O)c1ccnc2ccc(OC)cc12')
+quinidine_3
+
+# No need for the following line to show image!
+# Draw.MolsToGridImage((test), subImgSize=(250,250))
+```
+
+```{python}
+from rdkit.Chem import rdCIPLabeler
+rdCIPLabeler.AssignCIPLabels(quinidine_3)
+quinidine_3
+```
+
+```{python}
+# quinidine index 4
+
+quinidine_4 = Chem.MolFromSmiles('C=C[C@H]1CN2CC[C@H]1C[C@@H]2[C@@H](O)c1ccnc2ccc(OC)cc12')
+quinidine_4
+```
+
+```{python}
+rdCIPLabeler.AssignCIPLabels(quinidine_4)
+quinidine_4
+```
+
+Quinidine has 4 defined atom stereocentre count as per PubChem compound summary (as one of possible references for cross-checking) - https://pubchem.ncbi.nlm.nih.gov/compound/441074#section=Computed-Properties&fullscreen=true
+
+Therefore, most likely I'll remove the entry at index row 3 (it's also got a "NaN" for max_phase so this is also not very well defined...).
+
+
 
 ```{python}
 # 3a4 mod inhibitors
