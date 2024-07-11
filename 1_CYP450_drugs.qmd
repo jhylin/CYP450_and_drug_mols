@@ -62,9 +62,11 @@ Another possible way is to use get_target_sql(), e.g. using a specific CYP enzym
 from cyp_drugs import chembl_drugs
 
 # Get a list of strong cyp3a4 inhibitors
+# For the story on why I also added a weird spelling of "itraconzole", please see below.
+
 # and save as a tsv file
 df_3a4_strong_inh = chembl_drugs(
-    "CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE",
+    "CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "ITRACONZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE",
     #file_name="strong_3a4_inh"
     )
 df_3a4_strong_inh
@@ -179,8 +181,7 @@ image_2d6_s_inh = Draw.MolsToGridImage(df_2d6_s_inh_p["rdkit_mol"], molsPerRow=3
 image_2d6_s_inh
 ```
 
-* Will need to check quinidine - two entries
-* Noted different **stereochem** between the two quinidines (may remove the first one?)
+Noted different stereochemistry between the two quinidines.
 
 ```{python}
 # Some stereochemistries
@@ -192,7 +193,7 @@ image_2d6_s_inh
 df_2d6_s_inh_p.loc[3, "rdkit_mol"]
 ```
 
-An 2D image of quinine was shown as output
+An 2D image of quinine was shown as output.
 
 ```{python}
 df_2d6_s_inh_p.loc[4, "rdkit_mol"]
@@ -207,45 +208,29 @@ df_2d6_s_inh_p.loc[4, "canonical_smiles"]
 ```
 
 ```{python}
-from rdkit import Chem
-from rdkit.Chem import Draw
-from rdkit.Chem.Draw import IPythonConsole
-IPythonConsole.ipython_useSVG=True
+from rdkit.Chem import rdCIPLabeler
 IPythonConsole.drawOptions.addAtomIndices = False
+# Change to false to remove stereochem labels
 IPythonConsole.drawOptions.addStereoAnnotation = True
 
-# Testing single molecules - quinidine (index row 3)
-
+# quinidine at index row 3
 quinidine_3 = Chem.MolFromSmiles('C=C[C@H]1CN2CCC1C[C@@H]2[C@@H](O)c1ccnc2ccc(OC)cc12')
-quinidine_3
-
-# No need for the following line to show image!
-# Draw.MolsToGridImage((test), subImgSize=(250,250))
-```
-
-```{python}
-from rdkit.Chem import rdCIPLabeler
 rdCIPLabeler.AssignCIPLabels(quinidine_3)
 quinidine_3
 ```
 
-```{python}
-# quinidine index 4
+Ref: Stereochemical or CIP (Cahn–Ingold–Prelog) labeller in RDKit - https://rdkit.org/docs/source/rdkit.Chem.rdCIPLabeler.html#module-rdkit.Chem.rdCIPLabeler
 
+```{python}
+# quinidine index row 4
 quinidine_4 = Chem.MolFromSmiles('C=C[C@H]1CN2CC[C@H]1C[C@@H]2[C@@H](O)c1ccnc2ccc(OC)cc12')
-quinidine_4
-```
-
-```{python}
 rdCIPLabeler.AssignCIPLabels(quinidine_4)
 quinidine_4
 ```
 
-Quinidine has 4 defined atom stereocentre count as per PubChem compound summary (as one of possible references for cross-checking) - https://pubchem.ncbi.nlm.nih.gov/compound/441074#section=Computed-Properties&fullscreen=true
+Quinidine has 4 defined atom stereocentre count as per PubChem compound summary (as one of possible references for cross-checking) - https://pubchem.ncbi.nlm.nih.gov/compound/441074#section=Computed-Properties&fullscreen=true -> this is calculated on CHEMBL1294, which is the same as the quinidine spotted at index row 4!
 
-Therefore, most likely I'll remove the entry at index row 3 (it's also got a "NaN" for max_phase so this is also not very well defined...).
-
-
+*Therefore, most likely I'll remove the entry at index row 3 (it's also got a "NaN" for max_phase so this is also not very well defined...).*
 
 ```{python}
 # 3a4 mod inhibitors
@@ -259,9 +244,74 @@ image_3a4_s_inh = Draw.MolsToGridImage(df_3a4_s_inh_p["rdkit_mol"], molsPerRow=3
 image_3a4_s_inh
 ```
 
+```{python}
+df_3a4_s_inh_p
+```
+
 * Two itraconazoles to check - may need to remove one?
+
+```{python}
+# Get SMILES of itraconazole at index row 4
+df_3a4_s_inh_p.loc[4, "canonical_smiles"]
+```
+
+```{python}
+# Get SMILES of itraconazole at index row 5
+df_3a4_s_inh_p.loc[5, "canonical_smiles"]
+```
+
+
+
+```{python}
+itracon_4 = Chem.MolFromSmiles("CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5CO[C@](Cn6cncn6)(c6ccc(Cl)cc6Cl)O5)cc4)CC3)cc2)c1=O")
+rdCIPLabeler.AssignCIPLabels(itracon_4)
+itracon_4
+```
+
+```{python}
+itracon_5 = Chem.MolFromSmiles("CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OCC5COC(Cn6cncn6)(c6ccc(Cl)cc6Cl)O5)cc4)CC3)cc2)c1=O")
+rdCIPLabeler.AssignCIPLabels(itracon_5)
+itracon_5
+```
+
+Clearly, even if the SMILES of these two itraconzoles have not been converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other molecule is without, due to the presence of "@" in the SMILES string for the one at index row 4. So the output images show exactly one with chiral centres, where the other does not have any.
+
+PubChem calculations show difference result however for itraconazole with it being having only one defined atom stereocentre count and two undefined stereocentre counts. Ref: https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true
+
+Which one to keep? -> well...
+
+```{python}
+# canonical smiles of another itraconzole ChEMBL ID as CHEMBL224725
+# CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5COC(Cn6cncn6)(c6ccc(F)cc6F)O5)cc4)CC3)cc2)c1=O
+
+itracon_x = Chem.MolFromSmiles("CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5COC(Cn6cncn6)(c6ccc(F)cc6F)O5)cc4)CC3)cc2)c1=O")
+rdCIPLabeler.AssignCIPLabels(itracon_x)
+itracon_x
+```
+
+```{python}
+df_3a4_s_inh_p
+```
+
+Noted that the two itraconzoles obtained using the cyp_drug.py from ChEMBL have different ChEMBL ID numbers (ChEMBL ID: CHEMBL22587 and CHEMBL64391) to the one calculated in PubChem (ChEMBL ID: CHEMBL224725).
+
+Well, I've just found out a very strange thing in ChEMBL database, which is if I searched for "itraconazole" directly into the search field, only four entries appeared with ChEMBL IDs such as CHEMBL64391, CHEMBL22587, CHEMBL882 and CHEMBL5090785 appeared, and there was no ChEMBL224725. Then I noticed something that might be causing this discrepancy - a spelling error of itraconazole into "itraconzole", which was actually carried over into PubChem as well! [insert ![alt](link)] So to add this specially-spelled "itraconzole" into the dataframe, I did a quick fix which was literally adding the wrongly spelled name into the SQL query above when obtaining drug information through chembl_downloader.
+
+```{python}
+# new addition - "itraconzole"
+df_3a4_s_inh_p.loc[6, "canonical_smiles"]
+```
+
+```{python}
+# new addition - "itraconzole"
+itracon_6 = Chem.MolFromSmiles("CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5COC(Cn6cncn6)(c6ccc(F)cc6F)O5)cc4)CC3)cc2)c1=O")
+rdCIPLabeler.AssignCIPLabels(itracon_6)
+itracon_6
+```
+
 * 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category
 * MCS might be interesting to look at in this group of strong 3A4 inhibitors
+
 
 ```{python}
 # Check MCS first - may edit following code?
