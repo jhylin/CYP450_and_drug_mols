@@ -24,6 +24,17 @@ Recent commentary that mentions about "avoidome" - "Structure is beauty, but not
 
 Many have looked into structural alerts (one example repo - rd_filters). ChEMBL database also has a cheminformatic utils web service that provides structural alert computation for compounds. There are most likely many more (probably need to search for more).
 
+More on ChEMBL structural alerts sets:
+From ChEMBL 20, only 6 filters - http://chembl.blogspot.com/2015/02/chembl-20-released.html
+* Pfizer LINT filters - https://www.eurekaselect.com/article/24760
+* Glaxo Wellcome hard filters - https://pubs.acs.org/doi/10.1021/ci990423o
+* BMS HTS Deck Filters - https://pubs.acs.org/doi/10.1021/ci050504m
+* NIH MLSMR Excluded Functionality Filters - https://www.yumpu.com/en/document/read/12367541/mlsmr-excluded-functionality-filters-nih-molecular-libraries- (the old link provided in the old ChEMBL blog post was no longer available, this was found via KNIME's REOS Tagger webpage - https://hub.knime.com/knime/spaces/Examples/00_Components/Life%20Sciences/REOS%20Tagger~bWMuzeSbFgbCrLWA/current-state)
+* University of Dundee NTD Screening Library Filters - https://chemistry-europe.onlinelibrary.wiley.com/doi/10.1002/cmdc.200700139
+* PAINS filters - https://pubs.acs.org/doi/10.1021/jm901137j
+
+From ChEMBL 23, increased to 8 filters
+
 hERG potassium channel is also another frequently-looked aspect for drug toxicology due to its effect on cardiac QT prolongation.
 
 CYP450 enzymes also play a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there is anything interesting for further explorations.
