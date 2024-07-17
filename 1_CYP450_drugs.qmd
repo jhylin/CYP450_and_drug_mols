@@ -1,9 +1,10 @@
 ---
 title: "Cytochrome P450 and small molecules"
 author: Jennifer HY Lin
-date: '2024-7-10'
+date: '2024-7-17'
 draft: true
 categories: 
+    - Metabolism
     - Toxicology
     - RDKit
     - ChEMBL database
@@ -22,11 +23,11 @@ Recent commentary that mentions about "avoidome" - "Structure is beauty, but not
 - https://www.science.org/content/blog-post/john-keats-would-word - D. Lowe
 - https://fbdd-lit.blogspot.com/2024/03/ - P. Kenny
 
-Many have looked into structural alerts (one example repo - rd_filters). ChEMBL database also has a cheminformatic utils web service that provides structural alert computation for compounds. There are most likely many more (probably need to search for more).
+Many have looked into structural alerts (one example repo - rd_filters). ChEMBL database also has a cheminformatic utils web service that provides structural alert computations for compounds. There are most likely many more (probably need to search for more).
 
-More on ChEMBL structural alerts sets.
+More on ChEMBL structural alerts sets or filters.
 
-From ChEMBL 20, only 6 filters - http://chembl.blogspot.com/2015/02/chembl-20-released.html
+From ChEMBL 20, only 6 filters - http://chembl.blogspot.com/2015/02/chembl-20-released.html (it might appear that this blog post cited all 8 filters but in fact it only had 6)
 
 * Pfizer LINT filters - https://www.eurekaselect.com/article/24760
 
@@ -48,13 +49,27 @@ From ChEMBL 20-23, increased to 8 filters, two additional ones as below:
 
 RDKit ("Filtering unwanted substructures" - https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures) also has another NIH filter based on two other references - https://pubs.acs.org/doi/abs/10.1021/jm901070c and https://pubs.rsc.org/en/content/articlehtml/2015/ob/c4ob02287d#fn1. At one point I was so confused with this NIH filter here and the NIH MLSMR filter above... I thought they were the same but when I looked further they cited different reference papers. 
 
-RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](https://www.rdkit.org/docs/source/rdkit.Chem.rdfiltercatalog.html#rdkit.Chem.rdfiltercatalog.FilterCatalogParams.FilterCatalogs) class. Brenk filter seems to be the same as the CHEMBL_Dundee one since both of them quoted the same journal paper as reference. I think I should stop looking at every structural alerts journal papers in this world as there are many...
+RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](https://www.rdkit.org/docs/source/rdkit.Chem.rdfiltercatalog.html#rdkit.Chem.rdfiltercatalog.FilterCatalogParams.FilterCatalogs) class. Brenk filter seems to be the same as the CHEMBL_Dundee one since both of them quoted the same journal paper as reference. It's also got a ZINC one I think. I think I should stop looking at every structural alerts journal papers in this world as there are many...
 
 hERG potassium channel is also another frequently-looked aspect for drug toxicology due to its effect on cardiac QT prolongation.
 
 CYP450 enzymes also play a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there is anything interesting for further explorations.
 
 There is a nice background reading on the history involving CYP450 and their relevance to toxicities in drugs - https://doi.org/10.1007/s43188-020-00056-z. I don't think I can do a better job than this piece (or there may be more in the literatures) but this one sticks out for me at the time.
+
+A bit of a side-track as I came across a new paper online recently about using deep learning model for ADMET prediction and the data source used by this paper was from Therapeutics data commons (TDC). So while I'm working on this relevant topic of metabolism and toxicology of the ADMET, I thought to dig a bit deeper to see what sort of data were used by this group.
+
+Re. TDC ADME dataset, specifically the metabolism one on all five CYP isoenzymes, which were all derived from [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). I thought to have a closer look at the paper and also wanted to see if there were any detailed lists of molecules used in their *in vitro* testings. However, there were only mentions of 
+
+"...we tested 17,143 samples at between seven and fifteen concentrations for all five CYP isozymes. The samples consisted of 8,019 compounds from the MLSMR including compounds chosen for diversity and rule-of-five compliance, 16 synthetic tractability, and availability; 6,144 compounds from a set of biofocused libraries which included 1,114 FDA-approved drugs; and 2,980 compounds from combinatorial libraries containing privileged structures targeted at GPCRs and kinases, and libraries of purified natural products or related structures...". 
+
+If I went to its original journal paper site, there was only one additional Excel file with a long list of chemical scaffolds showing different CYP activities. So from the perspective of looking at approved drugs only, what I'm trying to do here might be interesting since I'm only planning to look at approved drugs only and this paper refernece used a mixture of diverse sets of molecules that were not all approved drugs. The only likely lists of compounds tested were shown in its figures 6 and 7 where 7 was more relevant for drug-drug interactions (not the goal of this post really). I then realised the ratio of FDA-approved drugs to the rest of the molecules testing in this paper was not very balanced, and noticed that what they were saying in its discussion about how they were not noticing prominent activities of CYP3A4 and 2D6 in the compounds they've tested, 
+
+"...It has been suggested that CYP 3A4 is the most prominent P450 isozyme in drug metabolism and hepatic distribution (Fig. 2b),25, 26 but the drugs in our collection do not appear to have been optimized away from this activity. There has also been speculation that CYP 2D6 isozyme plays a prominent role in drug metabolism,27 but no difference in activity was observed between diversity compounds and approved drugs for this isozyme..."
+
+Well, it might be also due to the imbalanced set of compounds used e.g. number of FDA-approved drugs vs. number of other compounds from other libraries (!).
+
+I also went to FDA's website to look at how the CYP stories were compiled. FDA link: https://www.fda.gov/drugs/drug-interactions-labeling/drug-development-and-drug-interactions-table-substrates-inhibitors-and-inducers. I've also noticed that in vitro inhibitors and clinical index inhibitors might not be completely the same. There were some overlappings in CYP3A4/5 and 2D6 for sure but definitely no exactly the same across all the commonly documented CYP isoenzymes on FDA website. 
 
 <br>
 
