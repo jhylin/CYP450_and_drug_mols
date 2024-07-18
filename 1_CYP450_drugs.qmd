@@ -1,7 +1,7 @@
 ---
 title: "Cytochrome P450 and small molecules"
 author: Jennifer HY Lin
-date: '2024-7-17'
+date: '2024-7-18'
 draft: true
 categories: 
     - Metabolism
@@ -88,6 +88,8 @@ So back to this new paper on predicting ADMET... how likely will it be useful in
 <br>
 
 ##### **Extracting data**
+
+It's time to do some coding.
 
 ```{python}
 import pandas as pd
@@ -238,11 +240,15 @@ image_2d6_s_inh
 
 <br>
 
-###### **Looking into duplicated structures**
+###### **Looking into duplicated structures and stereochemistries**
+
+I have a feeling looking into stereochemistries might not be needed for now but as a fun exercise, I should, so below is a small section on looking at two drugs more closely along with their stereochemistries.
+
+<br>
 
 ###### **quinidine**
 
-Noted different stereochemistry between the two quinidines.
+Noted different stereochemistries between the two quinidines.
 
 ```{python}
 # Some stereochemistries
@@ -251,24 +257,27 @@ Noted different stereochemistry between the two quinidines.
 ```
 
 ```{python}
+# Get 2D image of quinidine at row 3
 df_2d6_s_inh_p.loc[3, "rdkit_mol"]
 ```
 
-An 2D image of quinine was shown as output.
-
 ```{python}
+# Get 2D image of quinidine at row 4
 df_2d6_s_inh_p.loc[4, "rdkit_mol"]
 ```
 
 ```{python}
+# Get SMILES for quinidine at row 3
 df_2d6_s_inh_p.loc[3, "canonical_smiles"]
 ```
 
 ```{python}
+# Get SMILES for quinidine at row 4
 df_2d6_s_inh_p.loc[4, "canonical_smiles"]
 ```
 
 ```{python}
+# Label stereocentres
 from rdkit.Chem import rdCIPLabeler
 IPythonConsole.drawOptions.addAtomIndices = False
 # Change to false to remove stereochem labels
@@ -291,13 +300,19 @@ quinidine_4
 
 Quinidine has 4 defined atom stereocentre count as per PubChem compound summary (as one of possible references for cross-checking) - https://pubchem.ncbi.nlm.nih.gov/compound/441074#section=Computed-Properties&fullscreen=true -> this is calculated on CHEMBL1294, which is the same as the quinidine spotted at index row 4!
 
-*Therefore, most likely I'll remove the entry at index row 3 (it's also got a "NaN" for max_phase so this is also not very well defined...).*
+Dropping the quinidine at index row 3 for now.
+
+```{python}
+# Note: old index unchanged for now (?need to re-index)
+df_2d6_s_inh_p = df_2d6_s_inh_p.drop(labels = 3)
+df_2d6_s_inh_p
+```
 
 <br>
 
 ###### **itraconazole**
 
-* Two itraconazoles to check - may need to remove one?
+Two itraconazoles to check for stereochemistries.
 
 ```{python}
 df_3a4_s_inh_p.head()
@@ -331,26 +346,26 @@ rdCIPLabeler.AssignCIPLabels(itracon_5)
 itracon_5
 ```
 
-Clearly, even if the SMILES of these two itraconzoles have not been converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other molecule is without, due to the presence of "@" in the SMILES string for the one at index row 4. So the output images show exactly one with chiral centres, where the other does not have any.
+Clearly, even if the SMILES of these two itraconzoles have not been converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other molecule is without, due to the presence of "@" in the SMILES string for the one at index row 4. So the output images have shown exactly that - one with chiral centres, where the other does not have any.
 
-PubChem calculations show difference result however for itraconazole with it being having only one defined atom stereocentre count and two undefined stereocentre counts. Ref: https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true
+PubChem calculations have different result for itraconazole. It seems it only has one defined atom stereocentre count and two undefined stereocentre counts. Ref: https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true
+
+Noted that the two itraconzoles obtained using the cyp_drug.py from ChEMBL have different ChEMBL ID numbers (ChEMBL ID: CHEMBL22587 and CHEMBL64391) to the one calculated in PubChem (ChEMBL ID: CHEMBL224725). So below I've looked into CHEMBL224725 first.
 
 ```{python}
 # canonical smiles of another itraconzole ChEMBL ID as CHEMBL224725
 # CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5COC(Cn6cncn6)(c6ccc(F)cc6F)O5)cc4)CC3)cc2)c1=O
 
-itracon_x = Chem.MolFromSmiles("CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5COC(Cn6cncn6)(c6ccc(F)cc6F)O5)cc4)CC3)cc2)c1=O")
-rdCIPLabeler.AssignCIPLabels(itracon_x)
-itracon_x
+# itracon_x = Chem.MolFromSmiles("CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5COC(Cn6cncn6)(c6ccc(F)cc6F)O5)cc4)CC3)cc2)c1=O")
+# rdCIPLabeler.AssignCIPLabels(itracon_x)
+# itracon_x
+
+# note itracon_x = itracon_6 (later added)
 ```
 
-```{python}
-df_3a4_s_inh_p
-```
+Well, I've just found out a very strange thing in ChEMBL database, which was if I searched for "itraconazole" directly into the search field, only four entries appeared with ChEMBL IDs such as CHEMBL64391, CHEMBL22587, CHEMBL882 and CHEMBL5090785, and there was no ChEMBL224725. Then I noticed something that might be causing this discrepancy - a spelling error (which was most likely a typo by accident) of itraconazole as "itraconzole", which was actually carried over into PubChem as well. I did double check to make sure both "itraconzole" and the usual itraconazole were referring to the same chemical structure. Here are some screenshots showing the typo. ![Screenshot of "itraconzole" in ChEMBL database](chembl_itracon.png) ![Screenshot of "itraconzole" in PubChem that was inherited from ChEMBL](pubchem_itracon.png) 
 
-Noted that the two itraconzoles obtained using the cyp_drug.py from ChEMBL have different ChEMBL ID numbers (ChEMBL ID: CHEMBL22587 and CHEMBL64391) to the one calculated in PubChem (ChEMBL ID: CHEMBL224725).
-
-Well, I've just found out a very strange thing in ChEMBL database, which was if I searched for "itraconazole" directly into the search field, only four entries appeared with ChEMBL IDs such as CHEMBL64391, CHEMBL22587, CHEMBL882 and CHEMBL5090785 appeared, and there was no ChEMBL224725. Then I noticed something that might be causing this discrepancy - a spelling error of itraconazole as "itraconzole", which was actually carried over into PubChem as well! ![Screenshot of "itraconzole" in ChEMBL database](chembl_itracon.png) ![Screenshot of "itraconzole" in PubChem that was inherited from ChEMBL](pubchem_itracon.png) So to add this specially-spelled "itraconzole" into the dataframe, I did a quick fix which was literally adding the wrongly-spelled name into the SQL query above when obtaining drug information through chembl_downloader.
+So to add this specially-spelled "itraconzole" into the dataframe, I literally added the wrongly-spelled "itraconzole" into the SQL query above when obtaining drug information through chembl_downloader.
 
 ```{python}
 # new addition - "itraconzole"
@@ -364,9 +379,43 @@ rdCIPLabeler.AssignCIPLabels(itracon_6)
 itracon_6
 ```
 
-There is only one stereocentre for "itraconzole", which will match the CHEMBL224725 entry for "itraconzole" in PubChem. Well, without looking into other cross-referencing sources, and if only sticking with PubChem, then I'd opt for this CHEMBL224725 version of "itraconzole".
+There was only one stereocentre for "itraconzole", which would match the CHEMBL224725 entry for "itraconzole" in PubChem. Well, without looking into other cross-referencing sources, and if only sticking with PubChem for now, then I'd opt for this CHEMBL224725 version of "itraconzole".
 
-**Update dfs on quinidine (df_2d6_s_inh_p) & itraconzaole(df_3a4_s_inh_p)**
+I've then gone back to check all 3 (stereochemically-)different versions of itraconazole and found that the RDKit stereochemical calculations of these 3 itraconazoles have all basically matched their equivalent PubChem computations for atom sterecentre counts.
+
+[CHEMBL22587 - PubChem CID 55283](https://pubchem.ncbi.nlm.nih.gov/compound/55283#section=Computed-Properties&fullscreen=true) - 2 defined, 1 undefined atom stereocentre count 
+
+```{python}
+itracon_4
+```
+
+[CHEMBL64391 - PubChem CID 3793](https://pubchem.ncbi.nlm.nih.gov/compound/3793#section=Computed-Properties&fullscreen=true) - 0 defined, 3 undefined atom stereocentre count 
+
+```{python}
+itracon_5
+```
+
+[CHEMBL224725 - PubChem CID 44428219](https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true) - 1 defined, 2 undefined atom stereocentre count
+
+```{python}
+itracon_6
+```
+
+Dataframe of df_3a4_s_inh_p containing 3 different itraconazoles was then updated below to remove two of the triplicated entries.
+
+```{python}
+# Original df of strong 3a4 inhibitors
+df_3a4_s_inh_p
+```
+
+Keeping the one with max phase marked as 4.0 (the other two had "NaN").
+
+```{python}
+# Note old index unchanged (?need to re-index)
+# Dropping itraconazole at index rows 4 & 6
+df_3a4_s_inh_p = df_3a4_s_inh_p.drop(labels = [4, 6])
+df_3a4_s_inh_p
+```
 
 ```{python}
 # 3a4 moderate inhibitors
@@ -374,16 +423,18 @@ image_3a4_m_inh = Draw.MolsToGridImage(df_3a4_m_inh_p["rdkit_mol"], molsPerRow=3
 image_3a4_m_inh
 ```
 
-* There are 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category
+<br>
 
-* MCS might be interesting to look at in this group of strong 3A4 inhibitors
+##### **Time for maximum common substructures?**
+
+There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category of strong 3A4 inhibitors. Maximum common substructures might be interesting to look at in this group.
 
 
 ```{python}
-# Check MCS first - may edit following code?
+## Check MCS first - may write own code actually, the following compares two diff. molecules only
 
-## Following code borrowed from https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d by iwatobipen
 
+## Reference code borrowed from https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d by iwatobipen
 
 # from rdkit import Chem
 # from rdkit.Chem import Draw
@@ -392,7 +443,6 @@ image_3a4_m_inh
 # from rdkit.Chem.Draw import rdDepictor
 # rdDepictor.SetPreferCoordGen(True)
 # IPythonConsole.drawOptions.minFontSize=20
-
 
 # def view_difference(mol1, mol2):
 #     mcs = rdFMCS.FindMCS([mol1,mol2])
@@ -408,6 +458,7 @@ image_3a4_m_inh
 #         if atom.GetIdx() not in match2:
 #             target_atm2.append(atom.GetIdx())
 #     return Draw.MolsToGridImage([mol1, mol2],highlightAtomLists=[target_atm1, target_atm2])
+
 ```
 
 
