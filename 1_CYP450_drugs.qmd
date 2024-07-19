@@ -1,7 +1,8 @@
 ---
-title: "Cytochrome P450 and small molecules"
+title: "Cytochrome P450 (CYP) and small drug molecules"
+subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-7-18'
+date: '2024-7-19'
 draft: true
 categories: 
     - Metabolism
@@ -429,16 +430,60 @@ image_3a4_m_inh
 
 There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category of strong 3A4 inhibitors. Maximum common substructures might be interesting to look at in this group.
 
+May do this in separate smaller sections e.g. antifungals, macrolides, antivirals etc.
+
 
 ```{python}
-## Check MCS first - may write own code actually, the following compares two diff. molecules only
+## Re. MCS - time to learn the basics
+# FindMCS is for 2 or more mols & returns single-fragment MCS
+# RascalMCES (maximum common edge substructures) between 2 mols only & returns multi-fragment MCES (not going to use in this case)
 
+# Code example from https://rdkit.org/docs/GettingStartedInPython.html#findmcs with bits of my temporary draft code 
 
+from rdkit import Chem
+from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole, MolsToGridImage
+IPythonConsole.ipython_useSVG=True
+from rdkit.Chem import rdFMCS
+
+## Use RDKit mols
+mol1 = Chem.MolFromSmiles("O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C")
+mol2 = Chem.MolFromSmiles("CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC")
+mol3 = Chem.MolFromSmiles("c1(C=O)cc(OC)c(O)cc1")
+mols = [mol1,mol2,mol3]
+
+## Find MCS in mols
+res=rdFMCS.FindMCS(mols)
+
+## MCS result instance
+res
+# <rdkit.Chem.rdFMCS.MCSResult object at 0x...>
+
+# Get images of highlighted MCS
+MolsToGridImage(mols, subImgSize=(300, 200), highlightAtomLists=[m.GetSubstructMatch(res.queryMol) for m in mols])
+
+## Number of atoms in MCS
+# res.numAtoms
+# 10
+
+## Number of bonds in MCS
+# res.numBonds
+# 10
+
+## The SMARTS string that matches the found MCS
+# res.smartsString
+# '[#6]1(-[#6]):[#6]:[#6](-[#8]-[#6]):[#6](:[#6]:[#6]:1)-[#8]'
+
+# res.canceled
+# False
+```
+
+```{python}
 ## Reference code borrowed from https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d by iwatobipen
 
 # from rdkit import Chem
 # from rdkit.Chem import Draw
-# from rdkit.Chem.Draw import IPythonConsole
+#from rdkit.Chem.Draw import IPythonConsole
 # from rdkit.Chem import rdFMCS
 # from rdkit.Chem.Draw import rdDepictor
 # rdDepictor.SetPreferCoordGen(True)
@@ -458,9 +503,16 @@ There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibito
 #         if atom.GetIdx() not in match2:
 #             target_atm2.append(atom.GetIdx())
 #     return Draw.MolsToGridImage([mol1, mol2],highlightAtomLists=[target_atm1, target_atm2])
+```
+
+```{python}
+# There's also another example from RDKit blog post re. "New MCS features in 2023.09.1" - went into more details and new features etc.
+
 
 ```
 
 
 
-?fragments and other things
+
+
+?fragments or other things (maybe another post? as this one could be long again...)
