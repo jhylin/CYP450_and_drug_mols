@@ -433,12 +433,16 @@ There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibito
 
 May do this for all strong CYP3A4 mols first, then in separate smaller sections e.g. antifungals, macrolides, antivirals etc.
 
+Re. maximum common substructures:
+
+* FindMCS is for 2 or more mols & returns single-fragment MCS
+
+* RascalMCES (maximum common edge substructures) is for 2 mols only & returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details.
+
 ```{python}
 ## Re. MCS - time to learn the basics
-# FindMCS is for 2 or more mols & returns single-fragment MCS
-# RascalMCES (maximum common edge substructures) between 2 mols only & returns multi-fragment MCES (not going to use in this case)
 
-## Below code example from https://rdkit.org/docs/GettingStartedInPython.html#findmcs with bits of my temporary draft code 
+## Below code example is from https://rdkit.org/docs/GettingStartedInPython.html#findmcs
 
 ## Use RDKit mols
 # mol1 = Chem.MolFromSmiles("O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C")
@@ -507,6 +511,7 @@ s_3a4_mcs.smartsString
 ```
 
 Two interesting blog posts on RDKit's MCS:
+
 * https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html
 
 * https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/
