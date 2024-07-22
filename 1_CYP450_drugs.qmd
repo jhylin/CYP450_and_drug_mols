@@ -7,6 +7,7 @@ draft: true
 categories: 
     - Metabolism
     - Toxicology
+    - Pandas
     - RDKit
     - ChEMBL database
     - Python
@@ -487,7 +488,7 @@ s_3a4_mcs
 ```{python}
 # Get images of highlighted MCS
 # Strong CYP3A4 inhibitors
-Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(res.queryMol) for m in mols])
+Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s_3a4_mcs.queryMol) for m in mols])
 ```
 
 ```{python}
@@ -504,6 +505,11 @@ s_3a4_mcs.numBonds
 ## The SMARTS string that matches the found MCS
 s_3a4_mcs.smartsString
 ```
+
+Two interesting blog posts on RDKit's MCS:
+* https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html
+
+* https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/
 
 ```{python}
 
