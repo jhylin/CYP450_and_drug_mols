@@ -2,7 +2,7 @@
 title: "Cytochrome P450 (CYP) and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-7-19'
+date: '2024-7-22'
 draft: true
 categories: 
     - Metabolism
@@ -30,7 +30,9 @@ Many have looked into structural alerts (one example repo - rd_filters). ChEMBL 
 
 hERG potassium channel is also another frequently-looked aspect for drug toxicology due to its effect on cardiac QT prolongation.
 
-CYP450 enzymes also play a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there is anything interesting for further explorations.
+CYP450 enzymes also play a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there is anything interesting for further explorations. 
+
+There are 5 main ones that are usually being investigated which are CYP3A4, 2D6, 1A2, 2C9 and 2C19, but there are in fact more than these 5 CYPs, other CYPS are CYP1A1, 2A6, 2B6, 2C8, 2E1, 2J2, 3A5 (note: amlodipine), 3A7 and 4F2 (cite Guengerich paper).
 
 There is a nice background reading on the history involving CYP450 and their relevance to toxicities in drugs - https://doi.org/10.1007/s43188-020-00056-z. I don't think I can do a better job than this piece (or there may be more in the literatures) but this one sticks out for me at the time.
 
@@ -96,6 +98,17 @@ It's time to do some coding.
 import pandas as pd
 import chembl_downloader
 from chembl_downloader import latest
+from rdkit import Chem
+from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole
+# For maximum common substructures
+from rdkit.Chem import rdFMCS
+# Label stereocentres
+from rdkit.Chem import rdCIPLabeler
+IPythonConsole.drawOptions.addAtomIndices = False
+# Change to false to remove stereochem labels
+IPythonConsole.drawOptions.addStereoAnnotation = True
+IPythonConsole.ipython_useSVG=True
 ```
 
 ```{python}
@@ -172,7 +185,7 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 
 ```{python}
 ## Tried using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 (all latest major versions, note: rdkit has a latest minor release as 2024.03.4, which includes a patch for numpy 2.0)
-# Seems to work as a new df is generated but with some error messages shown though
+# Seemed to work as a new df was generated but with some error messages shown though
 # ---error message---
 # A module that was compiled using NumPy 1.x cannot be run in
 # NumPy 2.0.0 as it may crash. To support both 1.x and 2.x
@@ -183,9 +196,7 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 # We expect that some modules will need time to support NumPy 2.
 
 
-## 2 other possible things to try:
-# download latest rdkit patch 2024.03.4 (will look into?) or
-# downgrade pandas and numpy - confirmed that it worked with pandas 2.1.4 & numpy 1.26.4 with no error messages as output
+## used downgraded versions of pandas and numpy instead - confirmed that pandas 2.1.4, numpy 1.26.4 & rdkit 2024.3.1 worked with no error messages generated as output
 
 # preprocess canonical smiles 
 from mol_prep import preprocess
@@ -222,11 +233,6 @@ df_2d6_m_inh_p
 * Checking structural validities
 
 ```{python}
-from rdkit import Chem
-from rdkit.Chem import Draw
-from rdkit.Chem.Draw import IPythonConsole
-IPythonConsole.ipython_useSVG=True
-
 # 2d6 mod inhibitors
 image_2d6_m_inh = Draw.MolsToGridImage(df_2d6_m_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_2d6_m_inh_p["pref_name"]))
 image_2d6_m_inh
@@ -278,12 +284,6 @@ df_2d6_s_inh_p.loc[4, "canonical_smiles"]
 ```
 
 ```{python}
-# Label stereocentres
-from rdkit.Chem import rdCIPLabeler
-IPythonConsole.drawOptions.addAtomIndices = False
-# Change to false to remove stereochem labels
-IPythonConsole.drawOptions.addStereoAnnotation = True
-
 # quinidine at index row 3
 quinidine_3 = Chem.MolFromSmiles('C=C[C@H]1CN2CCC1C[C@@H]2[C@@H](O)c1ccnc2ccc(OC)cc12')
 rdCIPLabeler.AssignCIPLabels(quinidine_3)
@@ -409,7 +409,7 @@ Dataframe of df_3a4_s_inh_p containing 3 different itraconazoles was then update
 df_3a4_s_inh_p
 ```
 
-Keeping the one with max phase marked as 4.0 (the other two had "NaN").
+Keeping the one with max phase marked as 4.0 (the other two had "NaN" and had no relevant medical or therapeutic indication data documented in PubMed).
 
 ```{python}
 # Note old index unchanged (?need to re-index)
@@ -428,39 +428,32 @@ image_3a4_m_inh
 
 ##### **Time for maximum common substructures?**
 
-There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category of strong 3A4 inhibitors. Maximum common substructures might be interesting to look at in this group.
+There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category of **strong 3A4 inhibitors**. Maximum common substructures might be interesting to look at in this group.
 
-May do this in separate smaller sections e.g. antifungals, macrolides, antivirals etc.
-
+May do this for all strong CYP3A4 mols first, then in separate smaller sections e.g. antifungals, macrolides, antivirals etc.
 
 ```{python}
 ## Re. MCS - time to learn the basics
 # FindMCS is for 2 or more mols & returns single-fragment MCS
 # RascalMCES (maximum common edge substructures) between 2 mols only & returns multi-fragment MCES (not going to use in this case)
 
-# Code example from https://rdkit.org/docs/GettingStartedInPython.html#findmcs with bits of my temporary draft code 
-
-from rdkit import Chem
-from rdkit.Chem import Draw
-from rdkit.Chem.Draw import IPythonConsole, MolsToGridImage
-IPythonConsole.ipython_useSVG=True
-from rdkit.Chem import rdFMCS
+## Below code example from https://rdkit.org/docs/GettingStartedInPython.html#findmcs with bits of my temporary draft code 
 
 ## Use RDKit mols
-mol1 = Chem.MolFromSmiles("O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C")
-mol2 = Chem.MolFromSmiles("CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC")
-mol3 = Chem.MolFromSmiles("c1(C=O)cc(OC)c(O)cc1")
-mols = [mol1,mol2,mol3]
+# mol1 = Chem.MolFromSmiles("O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C")
+# mol2 = Chem.MolFromSmiles("CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC")
+# mol3 = Chem.MolFromSmiles("c1(C=O)cc(OC)c(O)cc1")
+# mols = [mol1,mol2,mol3]
 
 ## Find MCS in mols
-res=rdFMCS.FindMCS(mols)
+# res=rdFMCS.FindMCS(mols)
 
 ## MCS result instance
-res
+# res
 # <rdkit.Chem.rdFMCS.MCSResult object at 0x...>
 
 # Get images of highlighted MCS
-MolsToGridImage(mols, subImgSize=(300, 200), highlightAtomLists=[m.GetSubstructMatch(res.queryMol) for m in mols])
+# MolsToGridImage(mols, subImgSize=(300, 200), highlightAtomLists=[m.GetSubstructMatch(res.queryMol) for m in mols])
 
 ## Number of atoms in MCS
 # res.numAtoms
@@ -477,6 +470,45 @@ MolsToGridImage(mols, subImgSize=(300, 200), highlightAtomLists=[m.GetSubstructM
 # res.canceled
 # False
 ```
+
+```{python}
+## Get list of RDKit mols
+mols = list(df_3a4_s_inh_p["rdkit_mol"])
+mols
+
+## Find MCS in mols
+s_3a4_mcs=rdFMCS.FindMCS(mols)
+
+## MCS result instance
+s_3a4_mcs
+# <rdkit.Chem.rdFMCS.MCSResult object at 0x...>
+```
+
+```{python}
+# Get images of highlighted MCS
+# Strong CYP3A4 inhibitors
+Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(res.queryMol) for m in mols])
+```
+
+```{python}
+## Number of atoms in MCS
+s_3a4_mcs.numAtoms
+```
+
+```{python}
+## Number of bonds in MCS
+s_3a4_mcs.numBonds
+```
+
+```{python}
+## The SMARTS string that matches the found MCS
+s_3a4_mcs.smartsString
+```
+
+```{python}
+
+```
+
 
 ```{python}
 ## Reference code borrowed from https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d by iwatobipen
