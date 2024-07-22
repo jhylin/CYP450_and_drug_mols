@@ -18,29 +18,27 @@ bibliography: references.bib
 
 ##### **Some introductions**
 
-I initially wanted to work on something about drug toxicology without setting any goals or intentions on how this post would end (basically doing this as a free-style post) and currently I felt it would be more to do with metabolism, which was also directly linked to drug toxicity, an important area not to ignore during any therapeutic drug discovery and development work.
+I initially wanted to work on something about drug toxicology without setting any goals or intentions on how this post would end (basically doing this as a free-style post) and currently I felt it would be more to do with metabolism, which was also directly linked to drug toxicity, an important area not to ignore during any therapeutic drug discovery and developmental work.
 
 This post was sort of inspired by a recent commentary that talked about "avoidome" and DMPK-related proteins to avoid [@Fraser2024]. I also happened to encounter two other blog posts ([a post from D. Lowe](https://www.science.org/content/blog-post/john-keats-would-word), and [another one from P. Kenny](https://fbdd-lit.blogspot.com/2024/03/)) that have provided reviews on this commentary recently with interesting view points.
 
 In a very rough sense, three main areas have been looked at (not exhaustive) with the aim to create safer therapeutic drugs: 
 
-1. *Structural alerts* (known to cause adverse drug effects or PAINs)
+1. **Structural alerts** on compound substructures that were known to cause adverse drug effects or pan-assay interference compounds (PAINs)
 
-Many have looked into structural alerts (one example repo - rd_filters). ChEMBL database also has a cheminformatic utils web service that provides structural alert computations for compounds. There are most likely many more (probably need to search for more).
+    Many have looked into structural alerts (an example repo: [rd_filters](https://github.com/PatWalters/rd_filters)). ChEMBL database has already had a cheminformatic utils web service developed that provided structural alert computations for compounds. There were most likely much more efforts than these ones.
 
-2. *Toxicophores in relation to human ether-a-go-go-related gene (hERG) potassium channel* (this might be similar to the first one actually)
+2. Toxicophores in relation to **human ether-a-go-go-related gene (hERG) potassium channel** (this might be similar to the first one actually)
 
-hERG potassium channel is also another frequently-looked aspect for drug toxicology due to its effect on cardiac QT prolongation.
+    hERG potassium channel was also another frequently-looked-at aspect for drug toxicology due to its known effect leading to cardiac QT prolongations or more commonly known as arrhythmias.
 
-3. *Cytochrome P450 enzymes* (CYP450, CYP isoenzymes, CYP or CYPs)
+3. **Cytochrome P450 enzymes** (CYP450, CYP isoenzymes, CYP or CYPs), the well-known ones were CYP3A4, 2D6, 1A2, 2C9 and 2C19
 
-Other useful categories involved skin sensitisations, drug-induced liver injuries and more.
+    CYP450 enzymes played a key role in the metabolism and toxicology parts of the ADMET process of drugs, all I wanted to do was to look into the relationship between CYP450 and small drug molecules to see if there was anything interesting for further explorations. This post would start with the two largest groups of CYP inhibitors, so focussing on CYP3A4 and 2D6 first.
 
-CYP450 enzymes also played a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there was anything interesting for further explorations. 
+Other useful categories involved drug-induced skin sensitisations and liver injuries and more.
 
-There were 5 main ones that are usually being investigated which are CYP3A4, 2D6, 1A2, 2C9 and 2C19, but there are in fact more than these 5 CYPs, other CYPS are CYP1A1, 2A6, 2B6, 2C8, 2E1, 2J2, 3A5 (note: amlodipine), 3A7 and 4F2 (cite Guengerich paper).
-
-There is a nice background reading on the history involving CYP450 and their relevance to toxicities in drugs - https://doi.org/10.1007/s43188-020-00056-z. I don't think I can do a better job than this piece (or there may be more in the literatures) but this one sticks out for me at the time.
+While my focus was only on a very small cohort of small molecules relating to only two CYPs, it was also worth noting that there were actually more CYPs present as well, for example, CYP1A1, 2A6, 2B6, 2C8, 2E1, 2J2, 3A5 (note: amlodipine was a moderate CYP3A5 inhibitor and would be looked at below), 3A7 and 4F2 [@Guengerich2021]. The cited paper here also provided quite a comprehensive background on the history of CYP450 and their relevance to toxicities in drugs, so I won't repeat them here.
 
 <br>
 
