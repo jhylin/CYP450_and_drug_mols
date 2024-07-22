@@ -18,22 +18,27 @@ bibliography: references.bib
 
 ##### **Some introductions**
 
-Something about drug toxicology, or really as this post evolves, it's more about metabolism actually but also related to toxicity.
+I initially wanted to work on something about drug toxicology without setting any goals or intentions on how this post would end (basically doing this as a free-style post) and currently I felt it would be more to do with metabolism, which was also directly linked to drug toxicity, an important area not to ignore during any therapeutic drug discovery and development work.
 
-There seems to involve (in a very rough sense) 3 main types: *structural alerts* (in relation to known adverse effects or PAINs), *Human ether-a-go-go-related gene (hERG) potassium channel* and *cytochrome P450 enzymes* (CYP450, CYP isoenzymes, CYP or CYPs). There are most likely more as well (e.g. skin sensitisations, drug-induced liver injuries and more).
+This post was sort of inspired by a recent commentary that talked about "avoidome" and DMPK-related proteins to avoid [@Fraser2024]. I also happened to encounter two other blog posts ([a post from D. Lowe](https://www.science.org/content/blog-post/john-keats-would-word), and [another one from P. Kenny](https://fbdd-lit.blogspot.com/2024/03/)) that have provided reviews on this commentary recently with interesting view points.
 
-Recent commentary that mentions about "avoidome" - ref: "Structure is beauty, but not always truth" (cite: https://doi.org/10.1016/j.cell.2024.01.003) talks about DMPK-related proteins to avoid 
-- also mentioned two other blog posts which have reviewed this commentary recently (interesting view points)
-- https://www.science.org/content/blog-post/john-keats-would-word - D. Lowe
-- https://fbdd-lit.blogspot.com/2024/03/ - P. Kenny
+In a very rough sense, three main areas have been looked at (not exhaustive) with the aim to create safer therapeutic drugs: 
+
+1. *Structural alerts* (known to cause adverse drug effects or PAINs)
 
 Many have looked into structural alerts (one example repo - rd_filters). ChEMBL database also has a cheminformatic utils web service that provides structural alert computations for compounds. There are most likely many more (probably need to search for more).
 
+2. *Toxicophores in relation to human ether-a-go-go-related gene (hERG) potassium channel* (this might be similar to the first one actually)
+
 hERG potassium channel is also another frequently-looked aspect for drug toxicology due to its effect on cardiac QT prolongation.
 
-CYP450 enzymes also play a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there is anything interesting for further explorations. 
+3. *Cytochrome P450 enzymes* (CYP450, CYP isoenzymes, CYP or CYPs)
 
-There are 5 main ones that are usually being investigated which are CYP3A4, 2D6, 1A2, 2C9 and 2C19, but there are in fact more than these 5 CYPs, other CYPS are CYP1A1, 2A6, 2B6, 2C8, 2E1, 2J2, 3A5 (note: amlodipine), 3A7 and 4F2 (cite Guengerich paper).
+Other useful categories involved skin sensitisations, drug-induced liver injuries and more.
+
+CYP450 enzymes also played a key role in the toxicology part of ADMET process of therapeutic drugs, I thought to look into the relationship between CYP450 and small drug molecules initially to see if there was anything interesting for further explorations. 
+
+There were 5 main ones that are usually being investigated which are CYP3A4, 2D6, 1A2, 2C9 and 2C19, but there are in fact more than these 5 CYPs, other CYPS are CYP1A1, 2A6, 2B6, 2C8, 2E1, 2J2, 3A5 (note: amlodipine), 3A7 and 4F2 (cite Guengerich paper).
 
 There is a nice background reading on the history involving CYP450 and their relevance to toxicities in drugs - https://doi.org/10.1007/s43188-020-00056-z. I don't think I can do a better job than this piece (or there may be more in the literatures) but this one sticks out for me at the time.
 
