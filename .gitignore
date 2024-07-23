@@ -1,6 +1,7 @@
 1_CYP450_drugs_files
 1_CYP450_drugs.html
 1_CYP450_drugs.ipynb
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

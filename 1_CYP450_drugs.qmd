@@ -46,27 +46,27 @@ While my focus was only on a very small cohort of small molecules relating to on
 
 More on ChEMBL structural alerts sets or filters - to explore what sort of data sources were used to build these structural alerts.
 
-From ChEMBL 20, only 6 filters were present - http://chembl.blogspot.com/2015/02/chembl-20-released.html (it might appear that this blog post cited all 8 filters but in fact it only had 6)
+From ChEMBL 20, only 6 filters were present, as shown by this [ChEMBL blogpost](http://chembl.blogspot.com/2015/02/chembl-20-released.html) - it might appear that this blog post cited all 8 filters but in fact it only had 6.
 
-* Pfizer LINT filters - https://www.eurekaselect.com/article/24760
+* [Pfizer LINT filters](https://www.eurekaselect.com/article/24760)
 
-* Glaxo Wellcome hard filters - https://pubs.acs.org/doi/10.1021/ci990423o
+* [Glaxo Wellcome hard filters](https://pubs.acs.org/doi/10.1021/ci990423o)
 
-* BMS HTS Deck Filters - https://pubs.acs.org/doi/10.1021/ci050504m
+* [BMS HTS Deck Filters](https://pubs.acs.org/doi/10.1021/ci050504m)
 
-* NIH MLSMR Excluded Functionality Filters - https://www.yumpu.com/en/document/read/12367541/mlsmr-excluded-functionality-filters-nih-molecular-libraries- (the old link provided in the old ChEMBL blog post was no longer available, this was found via KNIME's REOS Tagger webpage - https://hub.knime.com/knime/spaces/Examples/00_Components/Life%20Sciences/REOS%20Tagger~bWMuzeSbFgbCrLWA/current-state)
+* [NIH MLSMR Excluded Functionality Filters](https://www.yumpu.com/en/document/read/12367541/mlsmr-excluded-functionality-filters-nih-molecular-libraries-) (the old link provided in the old ChEMBL blog post was no longer available, this was found via [KNIME's REOS Tagger webpage](https://hub.knime.com/knime/spaces/Examples/00_Components/Life%20Sciences/REOS%20Tagger~bWMuzeSbFgbCrLWA/current-state))
 
-* University of Dundee NTD Screening Library Filters (also known as "Brenk filter" in RDKit) - https://chemistry-europe.onlinelibrary.wiley.com/doi/10.1002/cmdc.200700139
+* [University of Dundee NTD Screening Library Filters](https://chemistry-europe.onlinelibrary.wiley.com/doi/10.1002/cmdc.200700139) (also known as "Brenk filter" in RDKit)
 
-* PAINS filters - https://pubs.acs.org/doi/10.1021/jm901137j
+* [PAINS filters](https://pubs.acs.org/doi/10.1021/jm901137j)
 
 From ChEMBL 20 to 23, there were 8 filters in total (I also agreed with rd_filters' README.md that there weren't many documentations about this in ChEMBL, because I tried to search on ChEMBL but nothing in details were found - this might be useful if this could be added in the future), the sources of the two additional ones were as follow:
 
-* Inpharmatica - unable to find direct source initially then I found out later that this was obtained through private communications between ChEMBL and Inpharmatic Ltd. in the earlier days as I went for more online searches (a bit of a convoluted process involving a few different key words...) and finally I came across an older ChEMBL presentation on ChEMBL 09 which mentioned about this, and also this was further elaborated by this paper (https://doi.org/10.1093/nar/gkw1074)
+* Inpharmatica - unable to find direct source initially then I found out later that this was obtained through private communications between ChEMBL and Inpharmatica Ltd. in the earlier days as I went for more online searches (a bit of a convoluted process involving a few different key words...) and finally I came across an older ChEMBL presentation on ChEMBL 09 which mentioned about this, and also this was further elaborated by this paper (https://doi.org/10.1093/nar/gkw1074)
 
-* SureChEMBL - https://chembl.gitbook.io/surechembl/chemical-search/smarts-search (old link provided by the paper at https://doi.org/10.1093/nar/gkw1074 also no longer exists)
+* [SureChEMBL](https://chembl.gitbook.io/surechembl/chemical-search/smarts-search) (old link provided by the paper at https://doi.org/10.1093/nar/gkw1074 also no longer exists)
 
-RDKit ("Filtering unwanted substructures" - https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures) also has another NIH filter based on two other references - https://pubs.acs.org/doi/abs/10.1021/jm901070c and https://pubs.rsc.org/en/content/articlehtml/2015/ob/c4ob02287d#fn1. At one point I was so confused with this NIH filter here and the NIH MLSMR filter above... I thought they were the same but when I looked further they cited different reference papers. 
+RDKit (["Filtering unwanted substructures"](https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures)) also has another NIH filter based on two other references - https://pubs.acs.org/doi/abs/10.1021/jm901070c and https://pubs.rsc.org/en/content/articlehtml/2015/ob/c4ob02287d#fn1. At one point I was so confused with this NIH filter here and the NIH MLSMR filter above... I thought they were the same but when I looked further they cited different reference papers. 
 
 RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](https://www.rdkit.org/docs/source/rdkit.Chem.rdfiltercatalog.html#rdkit.Chem.rdfiltercatalog.FilterCatalogParams.FilterCatalogs) class. Brenk filter seems to be the same as the CHEMBL_Dundee one since both of them quoted the same journal paper as reference. It's also got a ZINC one I think. 
 
@@ -121,7 +121,7 @@ latest_version = latest()
 print(f"The latest ChEMBL version is: {latest_version}")
 ```
 
-I'm using SQL via chembl_downloader again to download approved drugs with their ChEMBL ID and equivalent canonical SMILES. All of the CYP3A4 inhibitors extracted from ChEMBL are based on the [Flockhart table of drug interactions](https://drug-interactions.medicine.iu.edu/MainTable.aspx).
+I'm using SQL via chembl_downloader again to download approved drugs with their ChEMBL ID and equivalent canonical SMILES. All of the CYP3A4 inhibitors extracted from ChEMBL are based on the [Flockhart table of drug interactions](https://drug-interactions.medicine.iu.edu/MainTable.aspx) [@Flockhart2021].
 
 Note: Three other categories of medicines are not going to be looked at currently, which are the weak inhibitors, ones with in vitro evidence only and ones that are still pending reviews.
 
