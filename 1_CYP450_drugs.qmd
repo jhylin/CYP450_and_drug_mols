@@ -2,7 +2,7 @@
 title: "Cytochrome P450 (CYP) and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-7-22'
+date: '2024-7-24'
 draft: true
 categories: 
     - Metabolism
@@ -62,9 +62,9 @@ From ChEMBL 20, only 6 filters were present, as shown by this [ChEMBL blogpost](
 
 From ChEMBL 20 to 23, there were 8 filters in total (I also agreed with rd_filters' README.md that there weren't many documentations about this in ChEMBL, because I tried to search on ChEMBL but nothing in details were found - this might be useful if this could be added in the future), the sources of the two additional ones were as follow:
 
-* Inpharmatica - unable to find direct source initially then I found out later that this was obtained through private communications between ChEMBL and Inpharmatica Ltd. in the earlier days as I went for more online searches (a bit of a convoluted process involving a few different key words...) and finally I came across an older ChEMBL presentation on ChEMBL 09 which mentioned about this, and also this was further elaborated by this paper (https://doi.org/10.1093/nar/gkw1074)
+* Inpharmatica - unable to find direct source initially then I found out later that this was obtained through private communications between ChEMBL and Inpharmatica Ltd. in the earlier days as I went for more online searches (a bit of a convoluted process involving a few different key words...) and finally I came across an older ChEMBL presentation on ChEMBL 09 which mentioned about this, and also this was further elaborated by this paper [@chembl2017]
 
-* [SureChEMBL](https://chembl.gitbook.io/surechembl/chemical-search/smarts-search) (old link provided by the paper at https://doi.org/10.1093/nar/gkw1074 also no longer exists)
+* [SureChEMBL](https://chembl.gitbook.io/surechembl/chemical-search/smarts-search) (old link provided by the paper [@chembl2017] also no longer exists)
 
 RDKit (["Filtering unwanted substructures"](https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures)) also has another NIH filter based on two other references - https://pubs.acs.org/doi/abs/10.1021/jm901070c and https://pubs.rsc.org/en/content/articlehtml/2015/ob/c4ob02287d#fn1. At one point I was so confused with this NIH filter here and the NIH MLSMR filter above... I thought they were the same but when I looked further they cited different reference papers. 
 
@@ -430,15 +430,15 @@ image_3a4_m_inh
 
 <br>
 
-##### **Time for maximum common substructures?**
+##### **Time for maximum common substructures**
 
 There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category of **strong 3A4 inhibitors**. Maximum common substructures might be interesting to look at in this group.
 
-May do this for all strong CYP3A4 mols first, then in separate smaller sections e.g. antifungals, macrolides, antivirals etc.
+*May do this for all strong CYP3A4 mols first, then in separate smaller sections e.g. antifungals, macrolides, antivirals etc.*
 
 Re. maximum common substructures:
 
-* FindMCS is for 2 or more mols & returns single-fragment MCS
+* [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) is for 2 or more mols & returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
 
 * RascalMCES (maximum common edge substructures) is for 2 mols only & returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details.
 
@@ -482,19 +482,17 @@ Re. maximum common substructures:
 ```{python}
 ## Get list of RDKit mols
 mols = list(df_3a4_s_inh_p["rdkit_mol"])
-mols
+#mols
 
 ## Find MCS in mols
 s_3a4_mcs=rdFMCS.FindMCS(mols)
 
 ## MCS result instance
 s_3a4_mcs
-# <rdkit.Chem.rdFMCS.MCSResult object at 0x...>
 ```
 
 ```{python}
-# Get images of highlighted MCS
-# Strong CYP3A4 inhibitors
+# Get images of highlighted MCS for strong CYP3A4 inhibitors
 Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s_3a4_mcs.queryMol) for m in mols])
 ```
 
@@ -515,11 +513,36 @@ s_3a4_mcs.smartsString
 
 Two interesting blog posts on RDKit's MCS:
 
-* https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html
+* https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html - a nice tutorial-like piece that is good for learning as it introduces and explains about the MCS and FMCS algorithm
 
 * https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/
 
 ```{python}
+# reducing threshold to relax MCS rule - to see how MCS changes
+s_3a4_mcs_80=rdFMCS.FindMCS(mols, threshold=0.8)
+Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s_3a4_mcs_80.queryMol) for m in mols])
+```
+
+```{python}
+# Without changing threshold
+s_3a4_mcs1 = Chem.MolFromSmarts(s_3a4_mcs.smartsString)
+
+# Lowered threshold to 80% of mols
+s_3a4_mcs2 = Chem.MolFromSmarts(s_3a4_mcs_80.smartsString)
+```
+
+```{python}
+Draw.MolsToGridImage([s_3a4_mcs1, s_3a4_mcs2], legends=["MCS1", "MCS2: threshold = 0.8"])
+```
+
+?Add in moderate CYP3A$ inhibitors to see if MCS changes (as above only on strong 3A4 inhibitors)
+
+Check MCS for each different class of drugs e.g. antivirals, antifungals, macrolides... etc.
+
+
+```{python}
+# matching ring bonds (if any)
+
 
 ```
 
@@ -561,4 +584,4 @@ Two interesting blog posts on RDKit's MCS:
 
 
 
-?fragments or other things (maybe another post? as this one could be long again...)
+Future posts may involve looking at other CYPs, particularly on other inhibitors and substrates. Inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects.
