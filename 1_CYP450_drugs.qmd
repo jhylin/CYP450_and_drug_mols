@@ -535,7 +535,7 @@ s_3a4_mcs2 = Chem.MolFromSmarts(s_3a4_mcs_80.smartsString)
 Draw.MolsToGridImage([s_3a4_mcs1, s_3a4_mcs2], legends=["MCS1", "MCS2: threshold = 0.8"])
 ```
 
-?Add in moderate CYP3A$ inhibitors to see if MCS changes (as above only on strong 3A4 inhibitors)
+?Add in moderate CYP3A4 inhibitors to see if MCS changes (as above only on strong 3A4 inhibitors)
 
 Check MCS for each different class of drugs e.g. antivirals, antifungals, macrolides... etc.
 
