@@ -2,7 +2,7 @@
 title: "Cytochrome P450 (CYP) and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-7-24'
+date: '2024-7-25'
 draft: true
 categories: 
     - Metabolism
@@ -30,7 +30,7 @@ In a very rough sense, three main areas have been looked at (not exhaustive) wit
 
 2. Toxicophores in relation to **human ether-a-go-go-related gene (hERG) potassium channel** (this might be similar to the first one actually)
 
-    hERG potassium channel was also another frequently-looked-at aspect for drug toxicology due to its known effect leading to cardiac QT prolongations or more commonly known as arrhythmias.
+    hERG potassium channel was also another frequently-looked-at aspect for drug toxicology due to its known effect leading to cardiac QT prolongations or more commonly known as arrhythmias [@Curran1995].
 
 3. **Cytochrome P450 enzymes** (CYP450, CYP isoenzymes, CYP or CYPs), the well-known ones were CYP3A4, 2D6, 1A2, 2C9 and 2C19
 
@@ -66,7 +66,7 @@ From ChEMBL 20 to 23, there were 8 filters in total (I also agreed with rd_filte
 
 * [SureChEMBL](https://chembl.gitbook.io/surechembl/chemical-search/smarts-search) (old link provided by the paper [@chembl2017] also no longer exists)
 
-RDKit (["Filtering unwanted substructures"](https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures)) also has another NIH filter based on two other references - https://pubs.acs.org/doi/abs/10.1021/jm901070c and https://pubs.rsc.org/en/content/articlehtml/2015/ob/c4ob02287d#fn1. At one point I was so confused with this NIH filter here and the NIH MLSMR filter above... I thought they were the same but when I looked further they cited different reference papers. 
+RDKit (["Filtering unwanted substructures"](https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures)) also has another NIH filter based on two other references [@Jadhav2010] and [@Doveston2015]. At one point I was so confused with this NIH filter here and the NIH MLSMR filter above... I thought they were the same but when I looked further they cited different reference papers. 
 
 RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](https://www.rdkit.org/docs/source/rdkit.Chem.rdfiltercatalog.html#rdkit.Chem.rdfiltercatalog.FilterCatalogParams.FilterCatalogs) class. Brenk filter seems to be the same as the CHEMBL_Dundee one since both of them quoted the same journal paper as reference. It's also got a ZINC one I think. 
 
