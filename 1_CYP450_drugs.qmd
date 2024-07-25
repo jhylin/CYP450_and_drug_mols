@@ -7,6 +7,7 @@ draft: true
 categories: 
     - Metabolism
     - Toxicology
+    - Structural alerts
     - Pandas
     - RDKit
     - ChEMBL database
@@ -78,13 +79,13 @@ I also think I should stop looking at every structural alerts journal papers in 
 
 A bit of a side-track as I came across a new paper online recently about using deep learning model for ADMET prediction and the data source used by this paper was from Therapeutics data commons (TDC). So while I'm working on this relevant topic of CYP, metabolism and toxicology of the ADMET, I thought to dig a bit deeper to see what sort of data were used by this group.
 
-Re. [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism), specifically the metabolism one on all five CYP isoenzymes, were all derived from a 2009 paper by [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). I thought to have a closer look at the paper and also wanted to see if there were any detailed lists of molecules used in their *in vitro* testings. However, there were only mentions of,
+Re. [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism), specifically the metabolism one on all five CYP isoenzymes, were all derived from a 2009 paper by [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). I thought to have a closer look at the paper and also wanted to see if there were any detailed lists of molecules used in their *in vitro* testings. However, there were only mentions of:
 
-"...we tested 17,143 samples at between seven and fifteen concentrations for all five CYP isozymes. The samples consisted of 8,019 compounds from the MLSMR including compounds chosen for diversity and rule-of-five compliance, 16 synthetic tractability, and availability; 6,144 compounds from a set of biofocused libraries which included 1,114 FDA-approved drugs; and 2,980 compounds from combinatorial libraries containing privileged structures targeted at GPCRs and kinases, and libraries of purified natural products or related structures...". 
+> ...we tested 17,143 samples at between seven and fifteen concentrations for all five CYP isozymes. The samples consisted of 8,019 compounds from the MLSMR including compounds chosen for diversity and rule-of-five compliance, 16 synthetic tractability, and availability; 6,144 compounds from a set of biofocused libraries which included 1,114 FDA-approved drugs; and 2,980 compounds from combinatorial libraries containing privileged structures targeted at GPCRs and kinases, and libraries of purified natural products or related structures...
 
-If I went to its original journal paper site (the link provided was a NCBI one), there was only one additional Excel file with a long list of chemical scaffolds showing different CYP activities. So from the perspective of looking at approved drugs only, what I'm trying to do here might be interesting since I'm only planning to look at approved drugs only and this referenece paper used a mixture of diverse sets of molecules that were not all approved drugs. The only likely lists of compounds tested were shown in its figures 6 and 7, where figure 7 was more relevant for drug-drug interactions (not the goal of this post really). I then realised the ratio of FDA-approved drugs to the rest of the molecules tested in this paper was also not very balanced, and noticed that what they were saying in its discussion about how they were not noticing the usual prominent activities of CYP3A4 and 2D6 in the compounds they've tested, 
+If I went to its original journal paper site (the link provided was a NCBI one), there was only one additional Excel file with a long list of chemical scaffolds showing different CYP activities. So from the perspective of looking at approved drugs only, what I'm trying to do here might be interesting since I'm only planning to look at approved drugs only and this referenece paper used a mixture of diverse sets of molecules that were not all approved drugs. The only likely lists of compounds tested were shown in its figures 6 and 7, where figure 7 was more relevant for drug-drug interactions (not the goal of this post really). I then realised the ratio of FDA-approved drugs to the rest of the molecules tested in this paper was also not very balanced, and noticed that what they were saying in its discussion about how they were not noticing the usual prominent activities of CYP3A4 and 2D6 in the compounds they've tested:
 
-"...It has been suggested that CYP 3A4 is the most prominent P450 isozyme in drug metabolism and hepatic distribution (Fig. 2b),25, 26 but the drugs in our collection do not appear to have been optimized away from this activity. There has also been speculation that CYP 2D6 isozyme plays a prominent role in drug metabolism,27 but no difference in activity was observed between diversity compounds and approved drugs for this isozyme..."
+> ...It has been suggested that CYP 3A4 is the most prominent P450 isozyme in drug metabolism and hepatic distribution (Fig. 2b),^25^, ^26^ but the drugs in our collection do not appear to have been optimized away from this activity. There has also been speculation that CYP 2D6 isozyme plays a prominent role in drug metabolism,^27^ but no difference in activity was observed between diversity compounds and approved drugs for this isozyme...
 
 Well, it might be due to the imbalanced set of compounds used e.g. number of FDA-approved drug (smaller) vs. number of other compounds from other libraries (larger!).
 
@@ -432,9 +433,7 @@ image_3a4_m_inh
 
 ##### **Time for maximum common substructures**
 
-There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in this category of **strong 3A4 inhibitors**. Maximum common substructures might be interesting to look at in this group.
-
-*May do this for all strong CYP3A4 mols first, then in separate smaller sections e.g. antifungals, macrolides, antivirals etc.*
+Maximum common substructures might be interesting to look at in this group.
 
 Re. maximum common substructures:
 
@@ -443,10 +442,11 @@ Re. maximum common substructures:
 * RascalMCES (maximum common edge substructures) is for 2 mols only & returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details.
 
 ```{python}
+# ?Add code fold
+
 ## Re. MCS - time to learn the basics
 
 ## Below code example is from https://rdkit.org/docs/GettingStartedInPython.html#findmcs
-
 ## Use RDKit mols
 # mol1 = Chem.MolFromSmiles("O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C")
 # mol2 = Chem.MolFromSmiles("CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC")
@@ -479,16 +479,19 @@ Re. maximum common substructures:
 # False
 ```
 
+<br>
+
+###### **Strong CYP3A4 inhibitors**
+
 ```{python}
 ## Get list of RDKit mols
 mols = list(df_3a4_s_inh_p["rdkit_mol"])
-#mols
 
 ## Find MCS in mols
 s_3a4_mcs=rdFMCS.FindMCS(mols)
 
 ## MCS result instance
-s_3a4_mcs
+# s_3a4_mcs
 ```
 
 ```{python}
@@ -520,6 +523,7 @@ Two interesting blog posts on RDKit's MCS:
 ```{python}
 # reducing threshold to relax MCS rule - to see how MCS changes
 s_3a4_mcs_80=rdFMCS.FindMCS(mols, threshold=0.8)
+
 Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s_3a4_mcs_80.queryMol) for m in mols])
 ```
 
@@ -532,19 +536,67 @@ s_3a4_mcs2 = Chem.MolFromSmarts(s_3a4_mcs_80.smartsString)
 ```
 
 ```{python}
-Draw.MolsToGridImage([s_3a4_mcs1, s_3a4_mcs2], legends=["MCS1", "MCS2: threshold = 0.8"])
+Draw.MolsToGridImage([s_3a4_mcs1, s_3a4_mcs2], legends=["MCS1", "MCS2 with threshold = 0.8"])
 ```
 
-?Add in moderate CYP3A4 inhibitors to see if MCS changes (as above only on strong 3A4 inhibitors)
+<br>
 
-Check MCS for each different class of drugs e.g. antivirals, antifungals, macrolides... etc.
+###### **Moderate CYP3A4 inhibitors**
 
+TODO
+
+```{python}
+
+```
+
+<br>
+
+###### **Combining moderate and strong CYP3A4 inhibitors**
+
+Added in moderate CYP3A4 inhibitors to see if MCS changes (as above only for strong 3A4 inhibitors)
+
+```{python}
+# Concatenate dfs for moderate & strong CYP3A4 inhibitors
+df_3a4_all = pd.concat([df_3a4_s_inh_p, df_3a4_m_inh_p])
+# index un-changed for now
+print(df_3a4_all.shape)
+df_3a4_all.head()
+```
+
+```{python}
+mols = list(df_3a4_all["rdkit_mol"])
+```
+
+```{python}
+# Find MCS for all CYP3A4 inhibitors
+all_3a4_mcs = rdFMCS.FindMCS(mols)
+```
+
+```{python}
+all_3a4_mcs.smartsString
+```
+
+```{python}
+# All CYP3A4 inhibitors
+Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs.queryMol) for m in mols])
+```
+
+Ring bonds matching
 
 ```{python}
 # matching ring bonds (if any)
-
-
+all_3a4_mcs_ring = rdFMCS.FindMCS(mols, ringMatchesRingOnly=True)
 ```
+
+```{python}
+Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols])
+```
+
+*May need to look further into MCS functionalities/presets in RDKit...*
+
+There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in the strong CYP3A4 inhibitor cohort.
+
+*?Check MCS for each different class of drugs e.g. antivirals, antifungals, macrolides... etc.*
 
 
 ```{python}
@@ -576,7 +628,6 @@ Check MCS for each different class of drugs e.g. antivirals, antifungals, macrol
 
 ```{python}
 # There's also another example from RDKit blog post re. "New MCS features in 2023.09.1" - went into more details and new features etc.
-
 
 ```
 
