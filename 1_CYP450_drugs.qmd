@@ -2,7 +2,7 @@
 title: "Cytochrome P450 (CYP) and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-7-25'
+date: '2024-7-29'
 draft: true
 categories: 
     - Metabolism
@@ -77,21 +77,21 @@ I also think I should stop looking at every structural alerts journal papers in 
 
 ###### **More on CYPs and ADMET**
 
-A bit of a side-track as I came across a new paper online recently about using deep learning model for ADMET prediction and the data source used by this paper was from Therapeutics data commons (TDC). So while I'm working on this relevant topic of CYP, metabolism and toxicology of the ADMET, I thought to dig a bit deeper to see what sort of data were used by this group.
+A bit of a sidetrack as I came across a new paper online recently about using deep learning model for ADMET prediction and the data source used by this paper was from Therapeutics data commons (TDC). So while I'm working on this relevant topic of CYP, metabolism and toxicology of the ADMET, I thought to dig a bit deeper to see what sort of data were used by TDC.
 
-Re. [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism), specifically the metabolism one on all five CYP isoenzymes, were all derived from a 2009 paper by [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). I thought to have a closer look at the paper and also wanted to see if there were any detailed lists of molecules used in their *in vitro* testings. However, there were only mentions of:
+The [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism), specifically the metabolism one on all five CYP isoenzymes (CYP2C19, 2D6, 3A4, 1A2 and 2C9), were all derived from a 2009 paper by [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). I just wanted to have a closer look at this paper to see if there were any detailed lists of molecules used in their *in vitro* testings, but unfortunately (unless I missed something there...), it seemed there were only mentions of:
 
 > ...we tested 17,143 samples at between seven and fifteen concentrations for all five CYP isozymes. The samples consisted of 8,019 compounds from the MLSMR including compounds chosen for diversity and rule-of-five compliance, 16 synthetic tractability, and availability; 6,144 compounds from a set of biofocused libraries which included 1,114 FDA-approved drugs; and 2,980 compounds from combinatorial libraries containing privileged structures targeted at GPCRs and kinases, and libraries of purified natural products or related structures...
 
-If I went to its original journal paper site (the link provided was a NCBI one), there was only one additional Excel file with a long list of chemical scaffolds showing different CYP activities. So from the perspective of looking at approved drugs only, what I'm trying to do here might be interesting since I'm only planning to look at approved drugs only and this referenece paper used a mixture of diverse sets of molecules that were not all approved drugs. The only likely lists of compounds tested were shown in its figures 6 and 7, where figure 7 was more relevant for drug-drug interactions (not the goal of this post really). I then realised the ratio of FDA-approved drugs to the rest of the molecules tested in this paper was also not very balanced, and noticed that what they were saying in its discussion about how they were not noticing the usual prominent activities of CYP3A4 and 2D6 in the compounds they've tested:
+If I went to its original journal paper site (the link provided was a NCBI one), there was only one additional Excel file with a long list of chemical scaffolds showing different CYP activities (no other supplementary information I could spot there). The only likely lists of compounds tested were shown in its figures 6 and 7 in the paper, where figure 7 was more relevant for drug-drug interactions. I then realised the proportions of FDA-approved drugs used and the rest of the molecules tested in this paper were also not very balanced (thinking along the line of approved drugs and non-approved drugs), and noticed that what they were saying in its discussion about how they were not noticing the usual prominent activities of CYP3A4 and 2D6 in the compounds they've tested:
 
 > ...It has been suggested that CYP 3A4 is the most prominent P450 isozyme in drug metabolism and hepatic distribution (Fig. 2b),^25^, ^26^ but the drugs in our collection do not appear to have been optimized away from this activity. There has also been speculation that CYP 2D6 isozyme plays a prominent role in drug metabolism,^27^ but no difference in activity was observed between diversity compounds and approved drugs for this isozyme...
 
-Well, it might be due to the imbalanced set of compounds used e.g. number of FDA-approved drug (smaller) vs. number of other compounds from other libraries (larger!).
+Well, it might be due to the imbalanced set of compounds used e.g. number of FDA-approved drug (smaller) vs. number of other compounds from other libraries (larger).
 
-I also went to FDA's website to look at how the CYP stories were compiled. Here's the FDA link: https://www.fda.gov/drugs/drug-interactions-labeling/drug-development-and-drug-interactions-table-substrates-inhibitors-and-inducers. I've also noticed that *in vitro* inhibitors and clinical index inhibitors might not be completely the same across the CYPs. There were some overlappings in CYP3A4/5 and 2D6 for sure but definitely not exactly the same across all the documented CYP isoenzymes in the FDA webpage. 
+I also went to FDA's website to look at how the CYP stories were compiled ([the FDA link](https://www.fda.gov/drugs/drug-interactions-labeling/drug-development-and-drug-interactions-table-substrates-inhibitors-and-inducers)). I've also noticed that *in vitro* inhibitors and clinical index inhibitors might not be completely the same across the CYPs. There were some overlappings in CYP3A4/5 and 2D6 for sure but definitely not exactly the same across all the documented CYP isoenzymes in the FDA webpage. 
 
-So back to this new paper on predicting ADMET... how likely will it be useful in real-life drug-lead ADMET optimisation projects in drug discovery settings if the data source only involved a larger portion of non-approved drugs versus a smaller proportion of actual FDA-approved drugs? 
+So back to this new paper on predicting ADMET... how likely will it be useful in real-life hit/lead ADMET optimisation projects in drug discovery settings if the data source only involved a larger portion of non-approved drugs versus a smaller portion of actual FDA-approved drugs? It just shows that there were a lot of things to think about in the DMPK or ADMET areas in drug design or discovery pipelines, as ultimately this is crucial to see if a candidate molecule will proceed or not (i.e. causing toxicity or not and whether it's tolerable side effects or adverse and even life-threatening ones instead).
 
 <br>
 
