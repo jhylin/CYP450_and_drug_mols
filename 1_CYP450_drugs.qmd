@@ -431,20 +431,18 @@ image_3a4_m_inh
 
 <br>
 
-##### **Time for maximum common substructures**
+##### **Maximum common substructures**
 
-Maximum common substructures might be interesting to look at in this group.
+Maximum common substructures (MCS) might be interesting to look at in this group.
 
-Re. maximum common substructures:
+Re. MCS in RDKit:
 
 * [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) is for 2 or more mols & returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
 
-* RascalMCES (maximum common edge substructures) is for 2 mols only & returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details.
+* RascalMCES (maximum common edge substructures) is for 2 mols only & returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details
 
 ```{python}
 # ?Add code fold
-
-## Re. MCS - time to learn the basics
 
 ## Below code example is from https://rdkit.org/docs/GettingStartedInPython.html#findmcs
 ## Use RDKit mols
@@ -479,81 +477,89 @@ Re. maximum common substructures:
 # False
 ```
 
+Two other interesting blog posts on RDKit's MCS:
+
+* https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html - a nice tutorial-like piece that is good for learning as it introduces and explains about the MCS and FMCS algorithm
+
+* https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/ - a more detailed post providing code examples about atom matching
+
 <br>
 
 ###### **Strong CYP3A4 inhibitors**
 
 ```{python}
 ## Get list of RDKit mols
-mols = list(df_3a4_s_inh_p["rdkit_mol"])
+mols_s3a4 = list(df_3a4_s_inh_p["rdkit_mol"])
 
 ## Find MCS in mols
-s_3a4_mcs=rdFMCS.FindMCS(mols)
+s3a4_mcs = rdFMCS.FindMCS(mols_s3a4)
 
 ## MCS result instance
-# s_3a4_mcs
-```
+# s3a4_mcs
 
-```{python}
 # Get images of highlighted MCS for strong CYP3A4 inhibitors
-Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s_3a4_mcs.queryMol) for m in mols])
+Draw.MolsToGridImage(mols_s3a4, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs.queryMol) for m in mols_s3a4])
 ```
 
 ```{python}
 ## Number of atoms in MCS
-s_3a4_mcs.numAtoms
+s3a4_mcs.numAtoms
 ```
 
 ```{python}
 ## Number of bonds in MCS
-s_3a4_mcs.numBonds
+s3a4_mcs.numBonds
 ```
 
 ```{python}
 ## The SMARTS string that matches the found MCS
-s_3a4_mcs.smartsString
+s3a4_mcs.smartsString
 ```
 
-Two interesting blog posts on RDKit's MCS:
-
-* https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html - a nice tutorial-like piece that is good for learning as it introduces and explains about the MCS and FMCS algorithm
-
-* https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/
+Reducing threshold to relax MCS rule - to see how MCS changes:
 
 ```{python}
-# reducing threshold to relax MCS rule - to see how MCS changes
-s_3a4_mcs_80=rdFMCS.FindMCS(mols, threshold=0.8)
+s3a4_mcs_80=rdFMCS.FindMCS(mols_s3a4, threshold=0.8)
 
-Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s_3a4_mcs_80.queryMol) for m in mols])
+Draw.MolsToGridImage(mols_s3a4, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs_80.queryMol) for m in mols_s3a4])
 ```
 
 ```{python}
 # Without changing threshold
-s_3a4_mcs1 = Chem.MolFromSmarts(s_3a4_mcs.smartsString)
+s3a4_mcs1 = Chem.MolFromSmarts(s3a4_mcs.smartsString)
 
-# Lowered threshold to 80% of mols
-s_3a4_mcs2 = Chem.MolFromSmarts(s_3a4_mcs_80.smartsString)
-```
+# Lowered MCS threshold to 80% of mols
+s3a4_mcs2 = Chem.MolFromSmarts(s3a4_mcs_80.smartsString)
 
-```{python}
-Draw.MolsToGridImage([s_3a4_mcs1, s_3a4_mcs2], legends=["MCS1", "MCS2 with threshold = 0.8"])
+Draw.MolsToGridImage([s3a4_mcs1, s3a4_mcs2], legends=["MCS1", "MCS2 with threshold = 0.8"])
 ```
 
 <br>
 
 ###### **Moderate CYP3A4 inhibitors**
 
-TODO
+```{python}
+#df_3a4_m_inh_p
+```
 
 ```{python}
+## Get list of RDKit mols
+mols_m3a4 = list(df_3a4_m_inh_p["rdkit_mol"])
 
+## Find MCS in mols
+m3a4_mcs = rdFMCS.FindMCS(mols_m3a4)
+
+# Get images of highlighted MCS for moderate CYP3A4 inhibitors
+Draw.MolsToGridImage(mols_m3a4, subImgSize=(400, 300), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs.queryMol) for m in mols_m3a4])
 ```
+
+Only some of the drug molecules in this group were highlighted with MCS. It appeared to be less than the strong CYP3A4 inhibitor group.
 
 <br>
 
 ###### **Combining moderate and strong CYP3A4 inhibitors**
 
-Added in moderate CYP3A4 inhibitors to see if MCS changes (as above only for strong 3A4 inhibitors)
+Added in moderate CYP3A4 inhibitors to see if MCS changes.
 
 ```{python}
 # Concatenate dfs for moderate & strong CYP3A4 inhibitors
@@ -564,12 +570,12 @@ df_3a4_all.head()
 ```
 
 ```{python}
-mols = list(df_3a4_all["rdkit_mol"])
+mols_all = list(df_3a4_all["rdkit_mol"])
 ```
 
 ```{python}
 # Find MCS for all CYP3A4 inhibitors
-all_3a4_mcs = rdFMCS.FindMCS(mols)
+all_3a4_mcs = rdFMCS.FindMCS(mols_all)
 ```
 
 ```{python}
@@ -578,18 +584,18 @@ all_3a4_mcs.smartsString
 
 ```{python}
 # All CYP3A4 inhibitors
-Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs.queryMol) for m in mols])
+Draw.MolsToGridImage(mols_all, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs.queryMol) for m in mols_all])
 ```
 
-Ring bonds matching
+It appeared the MCS for most of them involved rings (e.g. cycloalkane, aromatic and macrolide ones). So looking at ring bonds matching next.
 
 ```{python}
 # matching ring bonds (if any)
-all_3a4_mcs_ring = rdFMCS.FindMCS(mols, ringMatchesRingOnly=True)
+all_3a4_mcs_ring = rdFMCS.FindMCS(mols_all, ringMatchesRingOnly=True)
 ```
 
 ```{python}
-Draw.MolsToGridImage(mols, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols])
+Draw.MolsToGridImage(mols_all, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols_all])
 ```
 
 *May need to look further into MCS functionalities/presets in RDKit...*
@@ -631,7 +637,9 @@ There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibito
 
 ```
 
+<br>
 
+###### **Strong CYP2D6 inhibitors**
 
 
 
