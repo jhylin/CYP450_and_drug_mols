@@ -600,6 +600,16 @@ Draw.MolsToGridImage(mols_all, subImgSize=(500, 400), molsPerRow=2, legends = li
 
 *May need to look further into MCS functionalities/presets in RDKit...*
 
+e.g. MCSBondCompare() class
+-> CheckBondRingMatch()
+-> CheckBondStereo()
+
+- e.g. MCSBondCompareParameter() class
+-> MatchFusedRings
+-> CompleteRingsOnly
+-> MatchStereo (to include bond stereo in comparison)
+
+
 There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in the strong CYP3A4 inhibitor cohort.
 
 *?Check MCS for each different class of drugs e.g. antivirals, antifungals, macrolides... etc.*
@@ -634,13 +644,13 @@ There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibito
 
 ```{python}
 # There's also another example from RDKit blog post re. "New MCS features in 2023.09.1" - went into more details and new features etc.
-
 ```
 
 <br>
 
 ###### **Strong CYP2D6 inhibitors**
 
+To be continued.
 
 
 Future posts may involve looking at other CYPs, particularly on other inhibitors and substrates. Inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects.
