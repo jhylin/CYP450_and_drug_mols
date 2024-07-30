@@ -502,13 +502,8 @@ Draw.MolsToGridImage(mols_s3a4, subImgSize=(500, 400), molsPerRow=2, legends = l
 ```
 
 ```{python}
-## Number of atoms in MCS
-s3a4_mcs.numAtoms
-```
-
-```{python}
-## Number of bonds in MCS
-s3a4_mcs.numBonds
+## Number of atoms and bonds in MCS
+s3a4_mcs.numAtoms, s3a4_mcs.numBonds
 ```
 
 ```{python}
@@ -600,6 +595,69 @@ Draw.MolsToGridImage(mols_all, subImgSize=(500, 400), molsPerRow=2, legends = li
 
 *May need to look further into MCS functionalities/presets in RDKit...*
 
+```{python}
+all_3a4_mcs_ring.queryMol
+```
+
+```{python}
+s3a4_mcs.queryMol
+```
+
+```{python}
+m3a4_mcs.queryMol
+```
+
+<br>
+
+###### **Looking at each drug class within strong CYP3A4 inhibitors**
+
+There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (e.g. ceritinib, tucatinib, idelalisib, ribociclib) in the strong CYP3A4 inhibitor cohort. For people unfamiliar with these drugs, ChEMBL database do have "drug indications" recorded for each approved drug that you might be able to use to deduce what each drug is used for (I happened to know them mostly on top of my head due to my old role). The "drug indications" can be added into the SQL query at the beginning so that it'll be included into the dataframes.
+
+###### **Antifungals**
+
+```{python}
+# MCS for all antifungals in strong CYP3A4 inhibitors
+df_s3a4_antifungal = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("ITRACONAZOLE", "KETOCONAZOLE", "VORICONAZOLE"))]
+
+s3a4_antif = rdFMCS.FindMCS(list(df_s3a4_antifungal["rdkit_mol"]))
+s3a4_antif.queryMol
+```
+
+<br>
+
+###### **Macrolides**
+
+```{python}
+# All macrolides in strong CYP3A4 inhibitors
+df_s3a4_macro = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("CLARITHROMYCIN", "TELITHROMYCIN"))]
+df_s3a4_macro
+```
+
+Just to clarify, telithromycin is actually an[ketolide antibacterial](https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/021144s019lbl.pdf#page=1), which is very similar to macrolide antibiotics (clarithromycin in this case).
+
+```{python}
+# Just showing how similar clarithromycin & telithromycin are in their structures
+Draw.MolsToGridImage(list(df_s3a4_macro["rdkit_mol"]), subImgSize=(300, 300), molsPerRow=2, legends = list(df_s3a4_macro["pref_name"]))
+```
+
+```{python}
+# MCS for all macrolides in strong CYP3A4 inhibitors
+s3a4_macro = rdFMCS.FindMCS(list(df_s3a4_macro["rdkit_mol"]))
+s3a4_macro.queryMol
+```
+
+The typical macrolide-associated 14-membered ring [@Douthwaite2001] was shown in the MCS for both drugs.
+
+<br>
+
+###### **Antivirals**
+
+
+
+
+
+Thinking about stereochemistry of the mols (?to look into this further):
+
 e.g. MCSBondCompare() class
 -> CheckBondRingMatch()
 -> CheckBondStereo()
@@ -609,10 +667,6 @@ e.g. MCSBondCompare() class
 -> CompleteRingsOnly
 -> MatchStereo (to include bond stereo in comparison)
 
-
-There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (ceritinib, tucatinib, idelalisib, ribociclib) in the strong CYP3A4 inhibitor cohort.
-
-*?Check MCS for each different class of drugs e.g. antivirals, antifungals, macrolides... etc.*
 
 
 ```{python}
@@ -652,5 +706,14 @@ There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibito
 
 To be continued.
 
+<br>
+
+###### **Moderate CYP2D6 inhibitors**
+
+To be continued.
+
+<br>
+
+##### **Future work**
 
 Future posts may involve looking at other CYPs, particularly on other inhibitors and substrates. Inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects.
