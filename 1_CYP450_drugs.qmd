@@ -104,12 +104,10 @@ import pandas as pd
 import chembl_downloader
 from chembl_downloader import latest
 from rdkit import Chem
-from rdkit.Chem import Draw
+from rdkit.Chem import Draw, AllChem
+# For maximum common substructures & labelling stereocentres
+from rdkit.Chem import rdFMCS, rdCIPLabeler
 from rdkit.Chem.Draw import IPythonConsole
-# For maximum common substructures
-from rdkit.Chem import rdFMCS
-# Label stereocentres
-from rdkit.Chem import rdCIPLabeler
 IPythonConsole.drawOptions.addAtomIndices = False
 # Change to false to remove stereochem labels
 IPythonConsole.drawOptions.addStereoAnnotation = True
@@ -633,7 +631,7 @@ df_s3a4_macro = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("CLARITHROMYCIN
 df_s3a4_macro
 ```
 
-Just to clarify, telithromycin is actually an[ketolide antibacterial](https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/021144s019lbl.pdf#page=1), which is very similar to macrolide antibiotics (clarithromycin in this case).
+Just to clarify, telithromycin is actually a[ketolide antibacterial](https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/021144s019lbl.pdf#page=1), which is very similar to macrolide antibiotics (clarithromycin in this case).
 
 ```{python}
 # Just showing how similar clarithromycin & telithromycin are in their structures
@@ -652,9 +650,59 @@ The typical macrolide-associated 14-membered ring [@Douthwaite2001] was shown in
 
 ###### **Antivirals**
 
+```{python}
+# All antivirals in strong CYP3A4 inhibitors
+df_s3a4_antiv = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("INDINAVIR", "NELFINAVIR", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR"))]
+df_s3a4_antiv
+```
+
+```{python}
+# Images of antivirals
+Draw.MolsToGridImage(list(df_s3a4_antiv["rdkit_mol"]), subImgSize=(300, 300), molsPerRow=2, legends = list(df_s3a4_antiv["pref_name"]))
+```
+
+```{python}
+# MCS for all antivirals
+s3a4_antiv = rdFMCS.FindMCS(list(df_s3a4_antiv["rdkit_mol"]))
+s3a4_antiv.queryMol
+```
+
+```{python}
+# Highlighting MCS for antivirals
+Draw.MolsToGridImage(list(df_s3a4_antiv["rdkit_mol"]), subImgSize=(300, 300), molsPerRow=2, legends = list(df_s3a4_antiv["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_antiv.queryMol) for m in mols_all])
+
+# MCS not very obvious here...
+```
+
+```{python}
+## To try and align these antivirals first (if possible?)
+
+# rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure()
+# https://www.rdkit.org/docs/source/rdkit.Chem.rdDepictor.html#rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure
+
+# Example code from RDKit docs
+# https://www.rdkit.org/docs/GettingStartedInPython.html#working-with-2d-molecules-generating-depictions
+
+# Using a template mol
+template = Chem.MolFromSmiles('c1nccc2n1ccc2')
+AllChem.Compute2DCoords(template)
+
+# Set of mols to compare with template mol
+ms = [Chem.MolFromSmiles(smi) for smi in ('OCCc1ccn2cnccc12','C1CC1Oc1cc2ccncn2c1','CNC(=O)c1nccc2cccn12')]
+
+for m in ms:
+    _ = AllChem.GenerateDepictionMatching2DStructure(m,template)
+Draw.MolsToGridImage(ms, molsPerRow=4, subImgSize=(200,200))
+```
+
+
+###### **Kinase inhibitors**
+
+To be added.
 
 
 
+###### **Other things to consider**
 
 Thinking about stereochemistry of the mols (?to look into this further):
 
