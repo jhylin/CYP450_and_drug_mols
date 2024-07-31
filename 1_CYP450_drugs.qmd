@@ -591,8 +591,6 @@ all_3a4_mcs_ring = rdFMCS.FindMCS(mols_all, ringMatchesRingOnly=True)
 Draw.MolsToGridImage(mols_all, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols_all])
 ```
 
-*May need to look further into MCS functionalities/presets in RDKit...*
-
 ```{python}
 all_3a4_mcs_ring.queryMol
 ```
@@ -670,37 +668,74 @@ s3a4_antiv.queryMol
 ```{python}
 # Highlighting MCS for antivirals
 Draw.MolsToGridImage(list(df_s3a4_antiv["rdkit_mol"]), subImgSize=(300, 300), molsPerRow=2, legends = list(df_s3a4_antiv["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_antiv.queryMol) for m in mols_all])
-
-# MCS not very obvious here...
 ```
 
-```{python}
-## To try and align these antivirals first (if possible?)
+Since MCS was not actually obvious here, I thought to try aligning these 5 antivirals to see if this was possible.
 
+```{python}
 # rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure()
 # https://www.rdkit.org/docs/source/rdkit.Chem.rdDepictor.html#rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure
 
-# Example code from RDKit docs
+# Below example code from RDKit docs
 # https://www.rdkit.org/docs/GettingStartedInPython.html#working-with-2d-molecules-generating-depictions
 
-# Using a template mol
-template = Chem.MolFromSmiles('c1nccc2n1ccc2')
-AllChem.Compute2DCoords(template)
+# # Using a template mol
+# template = Chem.MolFromSmiles('c1nccc2n1ccc2')
+# AllChem.Compute2DCoords(template)
 
-# Set of mols to compare with template mol
-ms = [Chem.MolFromSmiles(smi) for smi in ('OCCc1ccn2cnccc12','C1CC1Oc1cc2ccncn2c1','CNC(=O)c1nccc2cccn12')]
+# # Set of mols to compare with template mol
+# ms = [Chem.MolFromSmiles(smi) for smi in ('OCCc1ccn2cnccc12','C1CC1Oc1cc2ccncn2c1','CNC(=O)c1nccc2cccn12')]
 
-for m in ms:
-    _ = AllChem.GenerateDepictionMatching2DStructure(m,template)
-Draw.MolsToGridImage(ms, molsPerRow=4, subImgSize=(200,200))
+# for m in ms:
+#     _ = AllChem.GenerateDepictionMatching2DStructure(m,template)
+# Draw.MolsToGridImage(ms, molsPerRow=4, subImgSize=(200,200))
 ```
 
+```{python}
+# Having a look at antiviral df again
+#df_s3a4_antiv
+```
+
+If trying to align these 5 antivirals, it would fail the first time and then if I turned on the "acceptFailure" mode then it would be like this below. Ideally, it should be used on a series of analogues or SAR analysis (probably not to be used like this, but I was just curious).
+
+```{python}
+# Reference mol - indinavir
+temp = df_s3a4_antiv.loc[3, "rdkit_mol"]
+
+# Set of mols to compare - rest of antivirals
+mols_antiv = df_s3a4_antiv.loc[10:, "rdkit_mol"]
+
+for mol in mols_antiv:
+    _ = AllChem.GenerateDepictionMatching2DStructure(mol,temp, acceptFailure = False)
+
+Draw.MolsToGridImage(mols_antiv, molsPerRow=2, subImgSize=(200, 200), legends=list(df_s3a4_antiv["pref_name"]))
+
+# Unable to align if not setting acceptFailure = True - "Depict error: Substructure match with reference not found"
+```
+
+<br>
 
 ###### **Kinase inhibitors**
 
 To be added.
 
+<br>
 
+###### **Back to all CYP3A4 inhibitors again**
+
+Likely last thing to try next:
+
+The idea came from a RDKit post by Paolo Tosco on, "[New MCS features in 2023.09.1](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html)"
+
+* AtomCompare & BondCompare -> looking at elements/bond orders/aromaticities in ring systems OR
+
+* custom subclasses in AtomCompare & BondCompare -> looking at elements/bond orders/aromaticities in non-ring systems
+
+i.e. customise parameters e.g. rdFMCS.MCSParameters()
+
+Since it appeared that the MCS found above for all (moderate & strong) CYP3A4 inhibitors involved rings quite a bit, I might try the second option first.
+
+<br>
 
 ###### **Other things to consider**
 
@@ -757,6 +792,12 @@ To be continued.
 <br>
 
 ###### **Moderate CYP2D6 inhibitors**
+
+To be continued.
+
+<br>
+
+###### **Combining moderate & strong CYP2D6 inhibitors**
 
 To be continued.
 
