@@ -2,7 +2,7 @@
 title: "Cytochrome P450 (CYP) and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-7-29'
+date: '2024-8-1'
 draft: true
 categories: 
     - Metabolism
@@ -238,7 +238,7 @@ df_2d6_m_inh_p
 image_2d6_m_inh = Draw.MolsToGridImage(
     df_2d6_m_inh_p["rdkit_mol"], 
     molsPerRow=3, 
-    subImgSize=(250, 250), 
+    subImgSize=(400, 300), 
     legends=list(df_2d6_m_inh_p["pref_name"])
     )
 image_2d6_m_inh
@@ -250,7 +250,7 @@ image_2d6_m_inh
 image_2d6_s_inh = Draw.MolsToGridImage(
     df_2d6_s_inh_p["rdkit_mol"], 
     molsPerRow=3, 
-    subImgSize=(250, 250), 
+    subImgSize=(400, 300), 
     legends=list(df_2d6_s_inh_p["pref_name"])
     )
 image_2d6_s_inh
@@ -332,7 +332,7 @@ df_3a4_s_inh_p.head()
 
 ```{python}
 # 3a4 strong inhibitors
-image_3a4_s_inh = Draw.MolsToGridImage(df_3a4_s_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_3a4_s_inh_p["pref_name"]))
+image_3a4_s_inh = Draw.MolsToGridImage(df_3a4_s_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(400, 300), legends=list(df_3a4_s_inh_p["pref_name"]))
 image_3a4_s_inh
 ```
 
@@ -432,7 +432,7 @@ df_3a4_s_inh_p
 image_3a4_m_inh = Draw.MolsToGridImage(
     df_3a4_m_inh_p["rdkit_mol"], 
     molsPerRow=3, 
-    subImgSize=(250, 250), 
+    subImgSize=(400, 300), 
     legends=list(df_3a4_m_inh_p["pref_name"])
     )
 image_3a4_m_inh
@@ -509,7 +509,7 @@ s3a4_mcs = rdFMCS.FindMCS(mols_s3a4)
 # Get images of highlighted MCS for strong CYP3A4 inhibitors
 Draw.MolsToGridImage(
     mols_s3a4, 
-    subImgSize=(500, 400), 
+    subImgSize=(400, 300), 
     molsPerRow=2, 
     legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs.queryMol) for m in mols_s3a4]
     )
@@ -532,7 +532,7 @@ s3a4_mcs_80=rdFMCS.FindMCS(mols_s3a4, threshold=0.8)
 
 Draw.MolsToGridImage(
     mols_s3a4, 
-    subImgSize=(500, 400), 
+    subImgSize=(400, 300), 
     molsPerRow=2, 
     legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs_80.queryMol) for m in mols_s3a4]
     )
@@ -605,7 +605,7 @@ all_3a4_mcs.smartsString
 # All CYP3A4 inhibitors
 Draw.MolsToGridImage(
     mols_all, 
-    subImgSize=(500, 400), 
+    subImgSize=(400, 300), 
     molsPerRow=2, 
     legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs.queryMol) for m in mols_all]
     )
@@ -621,7 +621,7 @@ all_3a4_mcs_ring = rdFMCS.FindMCS(mols_all, ringMatchesRingOnly=True)
 ```{python}
 Draw.MolsToGridImage(
     mols_all, 
-    subImgSize=(500, 400), 
+    subImgSize=(400, 300), 
     molsPerRow=2, 
     legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols_all]
     )
@@ -673,7 +673,7 @@ Just to clarify, telithromycin is actually a [ketolide antibacterial](https://ww
 # Just showing how similar clarithromycin & telithromycin are in their structures
 Draw.MolsToGridImage(
     list(df_s3a4_macro["rdkit_mol"]), 
-    subImgSize=(300, 300), 
+    subImgSize=(400, 300), 
     molsPerRow=2, 
     legends = list(df_s3a4_macro["pref_name"])
     )
@@ -701,7 +701,7 @@ df_s3a4_antiv
 # Images of antivirals
 Draw.MolsToGridImage(
     list(df_s3a4_antiv["rdkit_mol"]), 
-    subImgSize=(300, 300), 
+    subImgSize=(400, 300), 
     molsPerRow=2, 
     legends = list(df_s3a4_antiv["pref_name"])
     )
@@ -717,7 +717,7 @@ s3a4_antiv.queryMol
 # Highlighting MCS for antivirals
 Draw.MolsToGridImage(
     list(df_s3a4_antiv["rdkit_mol"]), 
-    subImgSize=(300, 300), 
+    subImgSize=(400, 300), 
     molsPerRow=2, 
     legends = list(df_s3a4_antiv["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_antiv.queryMol) for m in list(df_s3a4_antiv["rdkit_mol"])]
     )
@@ -759,9 +759,9 @@ temp = df_s3a4_antiv.loc[3, "rdkit_mol"]
 mols_antiv = df_s3a4_antiv.loc[10:, "rdkit_mol"]
 
 for mol in mols_antiv:
-    _ = AllChem.GenerateDepictionMatching2DStructure(mol,temp, acceptFailure = True)
+    _ = AllChem.GenerateDepictionMatching2DStructure(mol,temp, acceptFailure = False)
 
-Draw.MolsToGridImage(mols_antiv, molsPerRow=2, subImgSize=(200, 200), legends=list(df_s3a4_antiv["pref_name"]))
+Draw.MolsToGridImage(mols_antiv, molsPerRow=2, subImgSize=(400, 300), legends=list(df_s3a4_antiv["pref_name"]))
 
 # Unable to align if not setting acceptFailure = True - "Depict error: Substructure match with reference not found"
 ```
@@ -790,11 +790,13 @@ s3a4_ki.queryMol
 # Highlighting MCS for kinase inhibitors
 Draw.MolsToGridImage(
     list(df_s3a4_ki["rdkit_mol"]), 
-    subImgSize=(300, 300), 
+    subImgSize=(400, 300), 
     molsPerRow=2, 
     legends = list(df_s3a4_ki["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_ki.queryMol) for m in list(df_s3a4_ki["rdkit_mol"])]
     )
 ```
+
+Pyrimidine ring (or part of fused pyrimidine derivatives in some cases) was shown in MCS highlighting for all 4 kinase inhibitors.
 
 <br>
 
@@ -819,12 +821,17 @@ Since it appeared that the MCS found above for all (moderate & strong) CYP3A4 in
 Thinking about stereochemistry of the mols (?to look into this further):
 
 e.g. MCSBondCompare() class
+
 -> CheckBondRingMatch()
+
 -> CheckBondStereo()
 
-- e.g. MCSBondCompareParameter() class
+e.g. MCSBondCompareParameter() class
+
 -> MatchFusedRings
+
 -> CompleteRingsOnly
+
 -> MatchStereo (to include bond stereo in comparison)
 
 
@@ -854,10 +861,6 @@ e.g. MCSBondCompare() class
 #         if atom.GetIdx() not in match2:
 #             target_atm2.append(atom.GetIdx())
 #     return Draw.MolsToGridImage([mol1, mol2],highlightAtomLists=[target_atm1, target_atm2])
-```
-
-```{python}
-# There's also another example from RDKit blog post re. "New MCS features in 2023.09.1" - went into more details and new features etc.
 ```
 
 <br>
