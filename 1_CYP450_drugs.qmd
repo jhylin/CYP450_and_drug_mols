@@ -85,7 +85,7 @@ The [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism),
 
 If I went to its original journal paper site (the link provided was a NCBI one), there was only one additional Excel file with a long list of chemical scaffolds showing different CYP activities (no other supplementary information I could spot there). The only likely lists of compounds tested were shown in its figures 6 and 7 in the paper, where figure 7 was more relevant for drug-drug interactions. I then realised the proportions of FDA-approved drugs used and the rest of the molecules tested in this paper were also not very balanced (thinking along the line of approved drugs and non-approved drugs), and noticed that what they were saying in its discussion about how they were not noticing the usual prominent activities of CYP3A4 and 2D6 in the compounds they've tested:
 
-> ...It has been suggested that CYP 3A4 is the most prominent P450 isozyme in drug metabolism and hepatic distribution (Fig. 2b),^25^, ^26^ but the drugs in our collection do not appear to have been optimized away from this activity. There has also been speculation that CYP 2D6 isozyme plays a prominent role in drug metabolism,^27^ but no difference in activity was observed between diversity compounds and approved drugs for this isozyme...
+> ...It has been suggested that CYP 3A4 is the most prominent P450 isozyme in drug metabolism and hepatic distribution (Fig. 2b),^25^^,^ ^26^ but the drugs in our collection do not appear to have been optimized away from this activity. There has also been speculation that CYP 2D6 isozyme plays a prominent role in drug metabolism,^27^ but no difference in activity was observed between diversity compounds and approved drugs for this isozyme...
 
 Well, it might be due to the imbalanced set of compounds used e.g. number of FDA-approved drug (smaller) vs. number of other compounds from other libraries (larger).
 
@@ -126,7 +126,7 @@ Note: Three other categories of medicines are not going to be looked at currentl
 
 A bit about retrieving data here, the following might not be the best way to get the data, but I've somehow incorporated chembl_downloader into my own small piece of function code to retrieve SMILES of approved drugs. Earlier on, I was repeating SQL queries and thought to improve them by using a function code instead - see Python script named as "cyp_drugs.py". It removes a large chunk of SQL query string every time when trying to get different CYP inhibitors, leaving only approved drug names so it's easier to read and understand.
 
-Another possible way is to use get_target_sql(), e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an example link for CYP2D6 in ChEMBL - https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D). The Flockhart table has clearly annotated each approved drug with journal paper citations, so I'm going to stick with the following method for now.
+Another possible way is to use get_target_sql(), e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an [example link for CYP2D6 in ChEMBL](https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D)). The Flockhart table has clearly annotated each approved drug with journal paper citations, so I'm going to stick with the following method for now.
 
 ```{python}
 ## Main issue previously was with sql string - too many quotation marks!
@@ -182,8 +182,6 @@ This group of drugs inhibiting CYP3A4/5 is the largest cohort of all the cytochr
 
 ##### **Import and preprocess data**
 
-* Will look at the two largest group of CYP inhibitors first (may need to include substrates and inducers too - depends on how this will go...)
-
 * Any interesting molecular motifs/substructures?
 
 ```{python}
@@ -237,14 +235,24 @@ df_2d6_m_inh_p
 
 ```{python}
 # 2d6 mod inhibitors
-image_2d6_m_inh = Draw.MolsToGridImage(df_2d6_m_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_2d6_m_inh_p["pref_name"]))
+image_2d6_m_inh = Draw.MolsToGridImage(
+    df_2d6_m_inh_p["rdkit_mol"], 
+    molsPerRow=3, 
+    subImgSize=(250, 250), 
+    legends=list(df_2d6_m_inh_p["pref_name"])
+    )
 image_2d6_m_inh
 ```
 
 
 ```{python}
 # 2d6 strong inhibitors
-image_2d6_s_inh = Draw.MolsToGridImage(df_2d6_s_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_2d6_s_inh_p["pref_name"]))
+image_2d6_s_inh = Draw.MolsToGridImage(
+    df_2d6_s_inh_p["rdkit_mol"], 
+    molsPerRow=3, 
+    subImgSize=(250, 250), 
+    legends=list(df_2d6_s_inh_p["pref_name"])
+    )
 image_2d6_s_inh
 ```
 
@@ -352,7 +360,7 @@ itracon_5
 
 Clearly, even if the SMILES of these two itraconzoles have not been converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other molecule is without, due to the presence of "@" in the SMILES string for the one at index row 4. So the output images have shown exactly that - one with chiral centres, where the other does not have any.
 
-PubChem calculations have different result for itraconazole. It seems it only has one defined atom stereocentre count and two undefined stereocentre counts. Ref: https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true
+PubChem calculations have different result for itraconazole. It seems it only has one defined atom stereocentre count and two undefined stereocentre counts ([PubChem reference](https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true)).
 
 Noted that the two itraconzoles obtained using the cyp_drug.py from ChEMBL have different ChEMBL ID numbers (ChEMBL ID: CHEMBL22587 and CHEMBL64391) to the one calculated in PubChem (ChEMBL ID: CHEMBL224725). So below I've looked into CHEMBL224725 first.
 
@@ -383,9 +391,7 @@ rdCIPLabeler.AssignCIPLabels(itracon_6)
 itracon_6
 ```
 
-There was only one stereocentre for "itraconzole", which would match the CHEMBL224725 entry for "itraconzole" in PubChem. Well, without looking into other cross-referencing sources, and if only sticking with PubChem for now, then I'd opt for this CHEMBL224725 version of "itraconzole".
-
-I've then gone back to check all 3 (stereochemically-)different versions of itraconazole and found that the RDKit stereochemical calculations of these 3 itraconazoles have all basically matched their equivalent PubChem computations for atom sterecentre counts.
+There was only one stereocentre for "itraconzole", which would match the CHEMBL224725 entry for "itraconzole" in PubChem. Well, without looking into other cross-referencing sources, and if only sticking with PubChem for now, I've then gone back to check all 3 (stereochemically-)different versions of itraconazole and found that the RDKit stereochemical calculations of these 3 itraconazoles have all basically matched their equivalent PubChem computations for atom sterecentre counts.
 
 [CHEMBL22587 - PubChem CID 55283](https://pubchem.ncbi.nlm.nih.gov/compound/55283#section=Computed-Properties&fullscreen=true) - 2 defined, 1 undefined atom stereocentre count 
 
@@ -412,7 +418,7 @@ Dataframe of df_3a4_s_inh_p containing 3 different itraconazoles was then update
 df_3a4_s_inh_p
 ```
 
-Keeping the one with max phase marked as 4.0 (the other two had "NaN" and had no relevant medical or therapeutic indication data documented in PubMed).
+Keeping the one with max phase marked as 4.0 (the other two had "NaN" and had no relevant medical or therapeutic indications data documented in PubMed).
 
 ```{python}
 # Note old index unchanged (?need to re-index)
@@ -423,7 +429,12 @@ df_3a4_s_inh_p
 
 ```{python}
 # 3a4 moderate inhibitors
-image_3a4_m_inh = Draw.MolsToGridImage(df_3a4_m_inh_p["rdkit_mol"], molsPerRow=3, subImgSize=(250, 250), legends=list(df_3a4_m_inh_p["pref_name"]))
+image_3a4_m_inh = Draw.MolsToGridImage(
+    df_3a4_m_inh_p["rdkit_mol"], 
+    molsPerRow=3, 
+    subImgSize=(250, 250), 
+    legends=list(df_3a4_m_inh_p["pref_name"])
+    )
 image_3a4_m_inh
 ```
 
@@ -435,9 +446,9 @@ Maximum common substructures (MCS) might be interesting to look at in this group
 
 Re. MCS in RDKit:
 
-* [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) is for 2 or more mols & returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
+* [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) is for 2 or more mols and returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
 
-* RascalMCES (maximum common edge substructures) is for 2 mols only & returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details
+* RascalMCES (maximum common edge substructures) is for 2 mols only and returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details
 
 ```{python}
 # ?Add code fold
@@ -477,26 +488,31 @@ Re. MCS in RDKit:
 
 Two other interesting blog posts on RDKit's MCS:
 
-* https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html - a nice tutorial-like piece that is good for learning as it introduces and explains about the MCS and FMCS algorithm
+* [https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html](https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html) - a nice tutorial-like piece that is good for learning as it introduces and explains about the MCS and FMCS algorithm
 
-* https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/ - a more detailed post providing code examples about atom matching
+* [https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/](https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/) - a more detailed post providing code examples about atom matching
 
 <br>
 
 ###### **Strong CYP3A4 inhibitors**
 
 ```{python}
-## Get list of RDKit mols
+# Get list of RDKit mols
 mols_s3a4 = list(df_3a4_s_inh_p["rdkit_mol"])
 
-## Find MCS in mols
+# Find MCS in mols
 s3a4_mcs = rdFMCS.FindMCS(mols_s3a4)
 
-## MCS result instance
+# MCS result instance
 # s3a4_mcs
 
 # Get images of highlighted MCS for strong CYP3A4 inhibitors
-Draw.MolsToGridImage(mols_s3a4, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs.queryMol) for m in mols_s3a4])
+Draw.MolsToGridImage(
+    mols_s3a4, 
+    subImgSize=(500, 400), 
+    molsPerRow=2, 
+    legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs.queryMol) for m in mols_s3a4]
+    )
 ```
 
 ```{python}
@@ -514,7 +530,12 @@ Reducing threshold to relax MCS rule - to see how MCS changes:
 ```{python}
 s3a4_mcs_80=rdFMCS.FindMCS(mols_s3a4, threshold=0.8)
 
-Draw.MolsToGridImage(mols_s3a4, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs_80.queryMol) for m in mols_s3a4])
+Draw.MolsToGridImage(
+    mols_s3a4, 
+    subImgSize=(500, 400), 
+    molsPerRow=2, 
+    legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs_80.queryMol) for m in mols_s3a4]
+    )
 ```
 
 ```{python}
@@ -536,17 +557,22 @@ Draw.MolsToGridImage([s3a4_mcs1, s3a4_mcs2], legends=["MCS1", "MCS2 with thresho
 ```
 
 ```{python}
-## Get list of RDKit mols
+# Get list of RDKit mols
 mols_m3a4 = list(df_3a4_m_inh_p["rdkit_mol"])
 
-## Find MCS in mols
+# Find MCS in mols
 m3a4_mcs = rdFMCS.FindMCS(mols_m3a4)
 
 # Get images of highlighted MCS for moderate CYP3A4 inhibitors
-Draw.MolsToGridImage(mols_m3a4, subImgSize=(400, 300), molsPerRow=2, legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs.queryMol) for m in mols_m3a4])
+Draw.MolsToGridImage(
+    mols_m3a4, 
+    subImgSize=(400, 300), 
+    molsPerRow=2, 
+    legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(m3a4_mcs.queryMol) for m in mols_m3a4]
+    )
 ```
 
-Only some of the drug molecules in this group were highlighted with MCS. It appeared to be less than the strong CYP3A4 inhibitor group.
+I just happend to spot a small code error above, so the MCS for moderate CYP3A4 inhibitors should be appearing for all here - aromatic (and macrolide) rings definitely involved.
 
 <br>
 
@@ -577,7 +603,12 @@ all_3a4_mcs.smartsString
 
 ```{python}
 # All CYP3A4 inhibitors
-Draw.MolsToGridImage(mols_all, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs.queryMol) for m in mols_all])
+Draw.MolsToGridImage(
+    mols_all, 
+    subImgSize=(500, 400), 
+    molsPerRow=2, 
+    legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs.queryMol) for m in mols_all]
+    )
 ```
 
 It appeared the MCS for most of them involved rings (e.g. cycloalkane, aromatic and macrolide ones). So looking at ring bonds matching next.
@@ -588,8 +619,15 @@ all_3a4_mcs_ring = rdFMCS.FindMCS(mols_all, ringMatchesRingOnly=True)
 ```
 
 ```{python}
-Draw.MolsToGridImage(mols_all, subImgSize=(500, 400), molsPerRow=2, legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols_all])
+Draw.MolsToGridImage(
+    mols_all, 
+    subImgSize=(500, 400), 
+    molsPerRow=2, 
+    legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols_all]
+    )
 ```
+
+Using queryMol to show the MCS structural outline for all CYP3A4 inhibitors, and each separate group of strong or moderate inhibitors.
 
 ```{python}
 all_3a4_mcs_ring.queryMol
@@ -629,11 +667,16 @@ df_s3a4_macro = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("CLARITHROMYCIN
 df_s3a4_macro
 ```
 
-Just to clarify, telithromycin is actually a[ketolide antibacterial](https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/021144s019lbl.pdf#page=1), which is very similar to macrolide antibiotics (clarithromycin in this case).
+Just to clarify, telithromycin is actually a [ketolide antibacterial](https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/021144s019lbl.pdf#page=1), which is very similar to macrolide antibiotics (clarithromycin in this case).
 
 ```{python}
 # Just showing how similar clarithromycin & telithromycin are in their structures
-Draw.MolsToGridImage(list(df_s3a4_macro["rdkit_mol"]), subImgSize=(300, 300), molsPerRow=2, legends = list(df_s3a4_macro["pref_name"]))
+Draw.MolsToGridImage(
+    list(df_s3a4_macro["rdkit_mol"]), 
+    subImgSize=(300, 300), 
+    molsPerRow=2, 
+    legends = list(df_s3a4_macro["pref_name"])
+    )
 ```
 
 ```{python}
@@ -656,7 +699,12 @@ df_s3a4_antiv
 
 ```{python}
 # Images of antivirals
-Draw.MolsToGridImage(list(df_s3a4_antiv["rdkit_mol"]), subImgSize=(300, 300), molsPerRow=2, legends = list(df_s3a4_antiv["pref_name"]))
+Draw.MolsToGridImage(
+    list(df_s3a4_antiv["rdkit_mol"]), 
+    subImgSize=(300, 300), 
+    molsPerRow=2, 
+    legends = list(df_s3a4_antiv["pref_name"])
+    )
 ```
 
 ```{python}
@@ -667,10 +715,15 @@ s3a4_antiv.queryMol
 
 ```{python}
 # Highlighting MCS for antivirals
-Draw.MolsToGridImage(list(df_s3a4_antiv["rdkit_mol"]), subImgSize=(300, 300), molsPerRow=2, legends = list(df_s3a4_antiv["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_antiv.queryMol) for m in mols_all])
+Draw.MolsToGridImage(
+    list(df_s3a4_antiv["rdkit_mol"]), 
+    subImgSize=(300, 300), 
+    molsPerRow=2, 
+    legends = list(df_s3a4_antiv["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_antiv.queryMol) for m in list(df_s3a4_antiv["rdkit_mol"])]
+    )
 ```
 
-Since MCS was not actually obvious here, I thought to try aligning these 5 antivirals to see if this was possible.
+I also thought about trying to align these 5 antivirals to see if this was possible.
 
 ```{python}
 # rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure()
@@ -706,7 +759,7 @@ temp = df_s3a4_antiv.loc[3, "rdkit_mol"]
 mols_antiv = df_s3a4_antiv.loc[10:, "rdkit_mol"]
 
 for mol in mols_antiv:
-    _ = AllChem.GenerateDepictionMatching2DStructure(mol,temp, acceptFailure = False)
+    _ = AllChem.GenerateDepictionMatching2DStructure(mol,temp, acceptFailure = True)
 
 Draw.MolsToGridImage(mols_antiv, molsPerRow=2, subImgSize=(200, 200), legends=list(df_s3a4_antiv["pref_name"]))
 
@@ -717,7 +770,31 @@ Draw.MolsToGridImage(mols_antiv, molsPerRow=2, subImgSize=(200, 200), legends=li
 
 ###### **Kinase inhibitors**
 
-To be added.
+```{python}
+#df_3a4_s_inh_p
+```
+
+```{python}
+# All kinase inhibitors 
+df_s3a4_ki = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("CERITINIB", "IDELALISIB", "RIBOCICLIB", "TUCATINIB"))]
+df_s3a4_ki
+```
+
+```{python}
+# MCS for all kinase inhibitors
+s3a4_ki = rdFMCS.FindMCS(list(df_s3a4_ki["rdkit_mol"]))
+s3a4_ki.queryMol
+```
+
+```{python}
+# Highlighting MCS for kinase inhibitors
+Draw.MolsToGridImage(
+    list(df_s3a4_ki["rdkit_mol"]), 
+    subImgSize=(300, 300), 
+    molsPerRow=2, 
+    legends = list(df_s3a4_ki["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_ki.queryMol) for m in list(df_s3a4_ki["rdkit_mol"])]
+    )
+```
 
 <br>
 
