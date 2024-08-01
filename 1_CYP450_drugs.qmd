@@ -759,7 +759,7 @@ temp = df_s3a4_antiv.loc[3, "rdkit_mol"]
 mols_antiv = df_s3a4_antiv.loc[10:, "rdkit_mol"]
 
 for mol in mols_antiv:
-    _ = AllChem.GenerateDepictionMatching2DStructure(mol,temp, acceptFailure = False)
+    _ = AllChem.GenerateDepictionMatching2DStructure(mol,temp, acceptFailure = True)
 
 Draw.MolsToGridImage(mols_antiv, molsPerRow=2, subImgSize=(400, 300), legends=list(df_s3a4_antiv["pref_name"]))
 
