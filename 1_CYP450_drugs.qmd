@@ -613,6 +613,8 @@ Draw.MolsToGridImage(
 
 It appeared the MCS for most of them involved rings (e.g. cycloalkane, aromatic and macrolide ones). So looking at ring bonds matching next.
 
+*Below section might be replaced with the set MCS parameters to match ring section below*
+
 ```{python}
 # matching ring bonds (if any)
 all_3a4_mcs_ring = rdFMCS.FindMCS(mols_all, ringMatchesRingOnly=True)
@@ -804,7 +806,7 @@ Pyrimidine ring (or part of fused pyrimidine derivatives in some cases) was show
 
 Likely last thing to try next:
 
-The idea came from a RDKit post by Paolo Tosco on, "[New MCS features in 2023.09.1](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html)"
+The idea came from a RDKit post by Paolo Tosco on, "[New MCS features in 2023.09.1](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html)" - the "Custom Python AtomCompare and BondCompare classes" section (other 3 sections were on degenerate MCSs, FinalMatchChecker and ShouldAcceptMCS - might be useful in some other cases)
 
 * AtomCompare & BondCompare -> looking at elements/bond orders/aromaticities in ring systems OR
 
@@ -812,13 +814,52 @@ The idea came from a RDKit post by Paolo Tosco on, "[New MCS features in 2023.09
 
 i.e. customise parameters e.g. rdFMCS.MCSParameters()
 
-Since it appeared that the MCS found above for all (moderate & strong) CYP3A4 inhibitors involved rings quite a bit, I might try the second option first.
+Since it appeared that the MCS found above for all (moderate & strong) CYP3A4 inhibitors involved rings quite a bit, I might try the second option first to see what other MCS might exist in non-ring systems.
+
+**Ring systems**
+
+However, before jumping to the non-ring systems, I just wanted to try the AtomCompare & BondCompare along with RingMatchesRingOnly + CompleteRingsOnly first.
+
+```{python}
+## Customise MCS parameters
+# Initiate a MCSParameter object
+params = rdFMCS.MCSParameters()
+# Define atom typer to be used to compare elements within rdFMCS.AtomCompare class
+params.AtomTyper = rdFMCS.AtomCompare.CompareElements
+# Define bond typer to be used to compare bond orders within rdFMCS.BondCompare class
+params.BondTyper = rdFMCS.BondCompare.CompareOrder
+# RingMatchesRingOnly - ring atoms to match other ring atoms only
+# CompleteRingsOnly - match full rings only
+params.BondCompareParameters.RingMatchesRingOnly = True
+params.BondCompareParameters.CompleteRingsOnly = False
+
+all_3a4_ringMCS = rdFMCS.FindMCS(mols_all, params)
+
+Draw.MolsToGridImage(
+    mols_all, 
+    subImgSize=(400, 300), 
+    molsPerRow=3, 
+    legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_ringMCS.queryMol) for m in mols_all]
+    )
+
+# When both BondCompareParameters are set to true, nil highlighted MCS shown
+# Turned off CompleteRingsOnly - allowing partial rings showed highlighted MCS 
+```
+
+**Non-ring systems**
+
+```{python}
+# To do
+
+```
 
 <br>
 
-###### **Other things to consider**
+###### **Other things to consider?**
 
-Thinking about stereochemistry of the mols (?to look into this further):
+*?to look into this further in a separate post*
+
+Thinking about stereochemistry of the mols:
 
 e.g. MCSBondCompare() class
 
@@ -864,6 +905,8 @@ e.g. MCSBondCompareParameter() class
 ```
 
 <br>
+
+*Should the following be in a separate post as well?*
 
 ###### **Strong CYP2D6 inhibitors**
 
