@@ -2,7 +2,7 @@
 title: "Cytochrome P450 (CYP) and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-8-1'
+date: '2024-8-5'
 draft: true
 categories: 
     - Metabolism
@@ -844,42 +844,26 @@ Draw.MolsToGridImage(
 
 # When both BondCompareParameters are set to true, nil highlighted MCS shown
 # Turned off CompleteRingsOnly - allowing partial rings showed highlighted MCS 
+
+# ?similar to earlier result when using ringMatchesRingOnly = True in FindMCS() for all_s3a4_mols
 ```
 
 **Non-ring systems**
 
 ```{python}
-# To do
+# Consider using CompareOrderOutsideRing class (for bonds) & CompareElementsOutsideRing class (for atoms)
+# to see if MCS changes (e.g. becomes larger)
+
 
 ```
 
 <br>
 
-###### **Other things to consider?**
+[Code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen below showed how to highlight molecular differences (opposite to highlighting only the MCS part). Alternative URL link and more examples can be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences).
 
-*?to look into this further in a separate post*
-
-Thinking about stereochemistry of the mols:
-
-e.g. MCSBondCompare() class
-
--> CheckBondRingMatch()
-
--> CheckBondStereo()
-
-e.g. MCSBondCompareParameter() class
-
--> MatchFusedRings
-
--> CompleteRingsOnly
-
--> MatchStereo (to include bond stereo in comparison)
-
-
+Possible use cases of this might be when dealing with a large set of analogues with changes in R-groups or during large compound screening and search (just as a few examples only, not exhaustive). The main thing I could see from the code below that was to find the MCSs for the input molecules, then use SMARTS strings of the MCSs in order to find atoms not in the MCSs ([GetSubstructMatch()](https://rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.Mol.GetSubstructMatch) part) then highlight that part of the molecules.
 
 ```{python}
-## Reference code borrowed from https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d by iwatobipen
-
 # from rdkit import Chem
 # from rdkit.Chem import Draw
 #from rdkit.Chem.Draw import IPythonConsole
@@ -906,7 +890,30 @@ e.g. MCSBondCompareParameter() class
 
 <br>
 
-*Should the following be in a separate post as well?*
+###### **Other things to consider?**
+
+*?separate post*
+
+Thinking about stereochemistry of the mols:
+
+e.g. MCSBondCompare() class
+
+-> CheckBondRingMatch()
+
+-> CheckBondStereo()
+
+e.g. MCSBondCompareParameter() class
+
+-> MatchFusedRings
+
+-> CompleteRingsOnly
+
+-> MatchStereo (to include bond stereo in comparison)
+
+
+<br>
+
+*?separate post as well*
 
 ###### **Strong CYP2D6 inhibitors**
 
@@ -923,6 +930,18 @@ To be continued.
 ###### **Combining moderate & strong CYP2D6 inhibitors**
 
 To be continued.
+
+<br>
+
+##### **Some notes after all**
+
+*interim findings, subjected to further changes*
+
+* Partial rings within heterocycles were shown mainly in MCS of CYP3A4 inhibitors (clinically-documented moderate and strong CYP3A4 inhibitors only)
+
+* Many pharmaceuticals have different types of rings found in their chemical structures, so it is unsurprising that inhibiting CYP3A4 is quite common in approved drugs
+
+* Might be interesting to compare the MCS found for CYP3A4 inhibitors with the MCS of CYP3A4 substrates
 
 <br>
 
