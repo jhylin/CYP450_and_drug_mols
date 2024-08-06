@@ -2,7 +2,7 @@
 title: "Cytochrome P450 (CYP) and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-8-5'
+date: '2024-8-6'
 draft: true
 categories: 
     - Metabolism
@@ -816,6 +816,8 @@ i.e. customise parameters e.g. rdFMCS.MCSParameters()
 
 Since it appeared that the MCS found above for all (moderate & strong) CYP3A4 inhibitors involved rings quite a bit, I might try the second option first to see what other MCS might exist in non-ring systems.
 
+<br>
+
 **Ring systems**
 
 However, before jumping to the non-ring systems, I just wanted to try the AtomCompare & BondCompare along with RingMatchesRingOnly + CompleteRingsOnly first.
@@ -837,25 +839,101 @@ all_3a4_ringMCS = rdFMCS.FindMCS(mols_all, params)
 
 Draw.MolsToGridImage(
     mols_all, 
-    subImgSize=(400, 300), 
+    subImgSize=(400, 400), 
     molsPerRow=3, 
     legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_ringMCS.queryMol) for m in mols_all]
     )
-
-# When both BondCompareParameters are set to true, nil highlighted MCS shown
-# Turned off CompleteRingsOnly - allowing partial rings showed highlighted MCS 
-
-# ?similar to earlier result when using ringMatchesRingOnly = True in FindMCS() for all_s3a4_mols
 ```
+
+* When both BondCompareParameters are set to true, nil highlighted ring shown (apart from ethyl chains being highlighted in every molecule)
+
+* Turned off CompleteRingsOnly - allowing partial rings showed highlighted MCS 
+
+* ?similar to earlier result when using ringMatchesRingOnly = True in FindMCS() for all_s3a4_mols
+
+<br>
 
 **Non-ring systems**
 
+Thinking about stereochemistry of the mols, specifically for bonds:
+
+e.g. MCSBondCompare() class
+
+-> CheckBondRingMatch()
+
+-> **CheckBondStereo()** - used in CompareOrderOutsideRings() class code below
+
+e.g. MCSBondCompareParameter() class
+
+-> MatchFusedRings
+
+-> CompleteRingsOnly
+
+-> **MatchStereo** (to include bond stereo in comparison) - used in CompareOrderOutsideRings() class code below
+
+
 ```{python}
 # Consider using CompareOrderOutsideRing class (for bonds) & CompareElementsOutsideRing class (for atoms)
-# to see if MCS changes (e.g. becomes larger)
+# to see if MCS changes (e.g. ?becomes larger)
 
+# Class code below were borrowed from RDKit blog post (https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explained the code very well already, particularly on why this was done as a custom "class" code and not a usual "function" one
 
+# Comparing bond orders outside ring systems using rdFMCS's MCSBondCompare
+class CompareOrderOutsideRings(rdFMCS.MCSBondCompare):
+
+    def __call__(self, p, mol1, bond1, mol2, bond2):
+
+        b1 = mol1.GetBondWithIdx(bond1)
+        b2 = mol2.GetBondWithIdx(bond2)
+
+        if (b1.IsInRing() and b2.IsInRing()) or (b1.GetBondType() == b2.GetBondType()):
+
+            if (p.MatchStereo and not self.CheckBondStereo(p, mol1, bond1, mol2, bond2)):
+                return False
+
+            if p.RingMatchesRingOnly:
+                return self.CheckBondRingMatch(p, mol1, bond1, mol2, bond2)
+
+            return True
+
+        return False
+
+# Comparing atom elements outside ring systems using rdFMCS's MCSAtomCompare
+class CompareElementsOutsideRings(rdFMCS.MCSAtomCompare):
+
+    def __call__(self, p, mol1, atom1, mol2, atom2):
+
+        a1 = mol1.GetAtomWithIdx(atom1)
+        a2 = mol2.GetAtomWithIdx(atom2)
+
+        if (a1.GetAtomicNum() != a2.GetAtomicNum()) and not (a1.IsInRing() and a2.IsInRing()):
+            return False
+
+        if (p.MatchChiralTag and not self.CheckAtomChirality(p, mol1, atom1, mol2, atom2)):
+            return False
+
+        if p.RingMatchesRingOnly:
+            return self.CheckAtomRingMatch(p, mol1, atom1, mol2, atom2)
+
+        return True
+
+params_or = rdFMCS.MCSParameters()
+params_or.AtomTyper = CompareElementsOutsideRings()
+params_or.BondTyper = CompareOrderOutsideRings()
+params_or.BondCompareParameters.RingMatchesRingOnly = True
+params_or.BondCompareParameters.CompleteRingsOnly = True
+
+all_3a4_orMCS = rdFMCS.FindMCS(mols_all, params_or)
+
+Draw.MolsToGridImage(
+    mols_all, 
+    subImgSize=(400, 400), 
+    molsPerRow=3, 
+    legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_orMCS.queryMol) for m in mols_all]
+    )
 ```
+
+By using the suggested CompareOrderOutsideRings() and CompareElementsOutsideRings() classes, the MCS has indeed become larger, where a full ring was highlighted as the MCS.
 
 <br>
 
@@ -890,29 +968,6 @@ Possible use cases of this might be when dealing with a large set of analogues w
 
 <br>
 
-###### **Other things to consider?**
-
-*?separate post*
-
-Thinking about stereochemistry of the mols:
-
-e.g. MCSBondCompare() class
-
--> CheckBondRingMatch()
-
--> CheckBondStereo()
-
-e.g. MCSBondCompareParameter() class
-
--> MatchFusedRings
-
--> CompleteRingsOnly
-
--> MatchStereo (to include bond stereo in comparison)
-
-
-<br>
-
 *?separate post as well*
 
 ###### **Strong CYP2D6 inhibitors**
@@ -937,7 +992,9 @@ To be continued.
 
 *interim findings, subjected to further changes*
 
-* Partial rings within heterocycles were shown mainly in MCS of CYP3A4 inhibitors (clinically-documented moderate and strong CYP3A4 inhibitors only)
+* Partial rings within heterocycles were shown mainly in MCS of CYP3A4 inhibitors (clinically-documented moderate and strong CYP3A4 inhibitors only) if we only used the default rdFMCS.AtomCompare and rdFMCS.BondCompare with the ring matching parameters (e.g. RingMatchesRingOnly)
+
+* Full rings were shown in the MCS if we extended the bond and atom comparisons to cover the non-ring systems (i.e. a more flexible comparison than a restricted one, but still making the code to match rings only) 
 
 * Many pharmaceuticals have different types of rings found in their chemical structures, so it is unsurprising that inhibiting CYP3A4 is quite common in approved drugs
 
