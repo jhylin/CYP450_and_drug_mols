@@ -1,5 +1,5 @@
 ---
-title: "Cytochrome P450 (CYP) and small drug molecules"
+title: "Cytochrome P450 and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
 date: '2024-8-7'
@@ -310,12 +310,12 @@ rdCIPLabeler.AssignCIPLabels(quinidine_4)
 quinidine_4
 ```
 
-Quinidine has 4 defined atom stereocentre count as per PubChem compound summary (as one of possible references for cross-checking) - https://pubchem.ncbi.nlm.nih.gov/compound/441074#section=Computed-Properties&fullscreen=true -> this is calculated on CHEMBL1294, which is the same as the quinidine spotted at index row 4!
+Quinidine has 4 defined atom stereocentre count as per PubChem compound summary (as one of possible references for cross-checking) - this is based on the calculation for [CHEMBL1294](https://pubchem.ncbi.nlm.nih.gov/compound/441074#section=Computed-Properties&fullscreen=true), which is the same as the quinidine spotted at index row 4!
 
 Dropping the quinidine at index row 3 for now.
 
 ```{python}
-# Note: old index unchanged for now (?need to re-index)
+# Note: old index unchanged for now (re-index later if needed)
 df_2d6_s_inh_p = df_2d6_s_inh_p.drop(labels = 3)
 df_2d6_s_inh_p
 ```
@@ -418,10 +418,10 @@ Dataframe of df_3a4_s_inh_p containing 3 different itraconazoles was then update
 df_3a4_s_inh_p
 ```
 
-Keeping the one with max phase marked as 4.0 (the other two had "NaN" and had no relevant medical or therapeutic indications data documented in PubMed).
+Keeping the one with max phase marked as 4.0 (the other two had "NaN" and had no relevant medical or therapeutic indications data documented in PubChem).
 
 ```{python}
-# Note old index unchanged (?need to re-index)
+# Note old index unchanged (re-index later if needed)
 # Dropping itraconazole at index rows 4 & 6
 df_3a4_s_inh_p = df_3a4_s_inh_p.drop(labels = [4, 6])
 df_3a4_s_inh_p
@@ -442,7 +442,7 @@ image_3a4_m_inh
 
 ##### **Maximum common substructures**
 
-Maximum common substructures (MCS) might be interesting to look at in this group.
+Maximum common substructures (MCS) might be interesting to look at for these CYP inhibitors.
 
 Re. MCS in RDKit:
 
@@ -450,7 +450,7 @@ Re. MCS in RDKit:
 
 * RascalMCES (maximum common edge substructures) is for 2 mols only and returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details
 
-A code example from https://rdkit.org/docs/GettingStartedInPython.html#findmcs might be a good starting point to learn about MCS.
+A [RDKit code example](https://rdkit.org/docs/GettingStartedInPython.html#findmcs) might be a good starting point to learn about MCS.
 
 Two other interesting blog posts on RDKit's MCS:
 
@@ -534,7 +534,8 @@ Draw.MolsToGridImage(
     mols_m3a4, 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(m3a4_mcs.queryMol) for m in mols_m3a4]
+    legends = list(df_3a4_s_inh_p["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(m3a4_mcs.queryMol) for m in mols_m3a4]
     )
 ```
 
@@ -562,7 +563,7 @@ all_3a4_mcs = rdFMCS.FindMCS(mols_all)
 ```
 
 ```{python}
-all_3a4_mcs.smartsString
+#all_3a4_mcs.smartsString
 ```
 
 ```{python}
@@ -571,13 +572,12 @@ Draw.MolsToGridImage(
     mols_all, 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs.queryMol) for m in mols_all]
+    legends = list(df_3a4_all["pref_name"]),
+    highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs.queryMol) for m in mols_all]
     )
 ```
 
 It appeared the MCS for most of them involved rings (e.g. cycloalkane, aromatic and macrolide ones). So looking at ring bonds matching next.
-
-*Below section might be replaced with the set MCS parameters to match ring section below*
 
 ```{python}
 # matching ring bonds (if any)
@@ -693,8 +693,7 @@ I also thought about trying to align these 5 antivirals to see if this was possi
 
 [Code example from RDKit docs](https://www.rdkit.org/docs/GettingStartedInPython.html#working-with-2d-molecules-generating-depictions)
 
-RDKit docs on [rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure()]
-(https://www.rdkit.org/docs/source/rdkit.Chem.rdDepictor.html#rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure)
+RDKit docs on [rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure()](https://www.rdkit.org/docs/source/rdkit.Chem.rdDepictor.html#rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure)
 
 ```{python}
 # Having a look at antiviral df again
@@ -758,9 +757,9 @@ Likely last thing to try next:
 
 The idea came from a RDKit post by Paolo Tosco on, "[New MCS features in 2023.09.1](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html)" - the "Custom Python AtomCompare and BondCompare classes" section (other 3 sections were on degenerate MCSs, FinalMatchChecker and ShouldAcceptMCS - might be useful in some other cases)
 
-* AtomCompare & BondCompare -> looking at elements/bond orders/aromaticities in ring systems OR
+* AtomCompare & BondCompare - looking at elements/bond orders/aromaticities in ring systems OR
 
-* custom subclasses in AtomCompare & BondCompare -> looking at elements/bond orders/aromaticities in non-ring systems
+* custom subclasses in AtomCompare & BondCompare - looking at elements/bond orders/aromaticities in non-ring systems
 
 i.e. customise parameters e.g. rdFMCS.MCSParameters()
 
@@ -795,36 +794,35 @@ Draw.MolsToGridImage(
     )
 ```
 
-* When both BondCompareParameters are set to true, nil highlighted ring shown (apart from ethyl chains being highlighted in every molecule)
+* When both BondCompareParameters were set to true, nil highlighted ring was shown (apart from ethyl chains being highlighted in every molecule)
 
-* Turned off CompleteRingsOnly - allowing partial rings showed highlighted MCS 
+* When turning off CompleteRingsOnly, this allowed partial rings showed highlighted MCS 
 
-* ?similar to earlier result when using ringMatchesRingOnly = True in FindMCS() for all_s3a4_mols
+* Similar output was generated when using ringMatchesRingOnly = True in FindMCS() for all of the CYP3A4 inhibitors earlier
 
 <br>
 
 **Non-ring systems**
 
-Thinking about stereochemistry of the mols, specifically for bonds:
+Thinking about stereochemistry of the molecules, specifically for bonds:
 
 e.g. MCSBondCompare() class
 
--> CheckBondRingMatch()
+- CheckBondRingMatch()
 
--> **CheckBondStereo()** - used in CompareOrderOutsideRings() class code below
+- **CheckBondStereo()** - used in CompareOrderOutsideRings() class code below
 
 e.g. MCSBondCompareParameter() class
 
--> MatchFusedRings
+- MatchFusedRings
 
--> CompleteRingsOnly
+- CompleteRingsOnly
 
--> **MatchStereo** (to include bond stereo in comparison) - used in CompareOrderOutsideRings() class code below
+- **MatchStereo** (to include bond stereo in comparison) - used in CompareOrderOutsideRings() class code below
 
 
 ```{python}
-# Consider using CompareOrderOutsideRing class (for bonds) & CompareElementsOutsideRing class (for atoms)
-# to see if MCS changes (e.g. ?becomes larger)
+# Using CompareOrderOutsideRing class (for bonds) & CompareElementsOutsideRing class (for atoms) to see if MCS changes 
 
 # Class code below were borrowed from RDKit blog post (https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explained the code very well already, particularly on why this was done as a custom "class" code and not a usual "function" one
 
@@ -879,7 +877,7 @@ all_3a4_orMCS = rdFMCS.FindMCS(mols_all, params_or)
 
 Draw.MolsToGridImage(
     mols_all, 
-    subImgSize=(400, 400), 
+    subImgSize=(400, 300), 
     molsPerRow=3, 
     legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_orMCS.queryMol) for m in mols_all]
     )
@@ -958,7 +956,7 @@ df_2d6_all.head()
 ```
 
 ```{python}
-#df_2d6_all
+df_2d6_all.shape
 ```
 
 ```{python}
@@ -978,19 +976,19 @@ Draw.MolsToGridImage(
 
 If combining both moderate and strong CYP2D6 inhibitors, without using further MCS functionalities, only ring structures were shown in the MCS highlighting.
 
+One characteristic about the CYP2D6 inhibitors here was that some of them were drugs acting on or relating to central nervous system (about 9 out of 14 drugs) - e.g. bupropion, fluoxetine, paroxetine, clobazam, doxepin, duloxetine, locaserin (an approved drug but withdrawn due to adverse effect; acting on serotonin receptor), moclobemide and rolapitant (antiemetic that crosses blood-brain barrier).
+
 <br>
 
-##### **Some notes after all...**
+##### **Some findings and future work**
 
 This post has become too long already so I'm going to stop here and gather some small findings if there are any.
-
-*interim findings, subjected to further changes*
 
 * Partial rings within heterocycles were shown mainly in MCS of CYP3A4 inhibitors (clinically-documented moderate and strong CYP3A4 inhibitors only) if we only used the default rdFMCS.AtomCompare and rdFMCS.BondCompare with the ring matching parameters (e.g. RingMatchesRingOnly)
 
 * Full rings were shown in the MCS if we extended the bond and atom comparisons to cover the non-ring systems (i.e. a more flexible comparison than a restricted one, but still making the code to match rings only) 
 
-* Many pharmaceuticals have different types of rings found in their chemical structures, so it is unsurprising that inhibiting CYP3A4 is quite common in approved drugs
+* Many pharmaceuticals have different types of rings found in their chemical structures [@Taylor2014], so it is unsurprising that inhibiting CYP3A4 is quite common in approved drugs
 
 * Might be interesting to compare the MCS found for CYP3A4 inhibitors with the MCS of CYP3A4 substrates
 
@@ -998,11 +996,9 @@ This post has become too long already so I'm going to stop here and gather some 
 
 * As to the differences between CYP3A4 and 2D6 inhibitors, perhaps it was very subtle, as both groups seemed to show ring structures... Perhaps looking at CYP2D6 substrates will help (I'm only scratching the surface here maybe)
 
-<br>
+* It might also worth to spend more time to explore the CYP structures in relation to these inhibitors (this would be more of a structure-based drug discovery realm), which might reveal more insights 
 
-##### **Future work**
-
-Future posts may involve looking at other CYPs, particularly on other inhibitors and substrates. Inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects.
+* Future posts may involve looking at other CYPs, particularly on other inhibitors and substrates. Inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects
 
 <br>
 
