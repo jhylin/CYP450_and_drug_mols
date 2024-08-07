@@ -450,41 +450,7 @@ Re. MCS in RDKit:
 
 * RascalMCES (maximum common edge substructures) is for 2 mols only and returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details
 
-```{python}
-# ?Add code fold
-
-## Below code example is from https://rdkit.org/docs/GettingStartedInPython.html#findmcs
-## Use RDKit mols
-# mol1 = Chem.MolFromSmiles("O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C")
-# mol2 = Chem.MolFromSmiles("CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC")
-# mol3 = Chem.MolFromSmiles("c1(C=O)cc(OC)c(O)cc1")
-# mols = [mol1,mol2,mol3]
-
-## Find MCS in mols
-# res=rdFMCS.FindMCS(mols)
-
-## MCS result instance
-# res
-# <rdkit.Chem.rdFMCS.MCSResult object at 0x...>
-
-# Get images of highlighted MCS
-# MolsToGridImage(mols, subImgSize=(300, 200), highlightAtomLists=[m.GetSubstructMatch(res.queryMol) for m in mols])
-
-## Number of atoms in MCS
-# res.numAtoms
-# 10
-
-## Number of bonds in MCS
-# res.numBonds
-# 10
-
-## The SMARTS string that matches the found MCS
-# res.smartsString
-# '[#6]1(-[#6]):[#6]:[#6](-[#8]-[#6]):[#6](:[#6]:[#6]:1)-[#8]'
-
-# res.canceled
-# False
-```
+A code example from https://rdkit.org/docs/GettingStartedInPython.html#findmcs might be a good starting point to learn about MCS.
 
 Two other interesting blog posts on RDKit's MCS:
 
@@ -725,24 +691,10 @@ Draw.MolsToGridImage(
 
 I also thought about trying to align these 5 antivirals to see if this was possible.
 
-```{python}
-# rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure()
-# https://www.rdkit.org/docs/source/rdkit.Chem.rdDepictor.html#rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure
+[Code example from RDKit docs](https://www.rdkit.org/docs/GettingStartedInPython.html#working-with-2d-molecules-generating-depictions)
 
-# Below example code from RDKit docs
-# https://www.rdkit.org/docs/GettingStartedInPython.html#working-with-2d-molecules-generating-depictions
-
-# # Using a template mol
-# template = Chem.MolFromSmiles('c1nccc2n1ccc2')
-# AllChem.Compute2DCoords(template)
-
-# # Set of mols to compare with template mol
-# ms = [Chem.MolFromSmiles(smi) for smi in ('OCCc1ccn2cnccc12','C1CC1Oc1cc2ccncn2c1','CNC(=O)c1nccc2cccn12')]
-
-# for m in ms:
-#     _ = AllChem.GenerateDepictionMatching2DStructure(m,template)
-# Draw.MolsToGridImage(ms, molsPerRow=4, subImgSize=(200,200))
-```
+RDKit docs on [rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure()]
+(https://www.rdkit.org/docs/source/rdkit.Chem.rdDepictor.html#rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure)
 
 ```{python}
 # Having a look at antiviral df again
@@ -937,34 +889,9 @@ By using the suggested CompareOrderOutsideRings() and CompareElementsOutsideRing
 
 <br>
 
-[Code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen below showed how to highlight molecular differences (opposite to highlighting only the MCS part). Alternative URL link and more examples can be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences).
+[Another code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen below showed how to highlight molecular differences (which was opposite to highlighting only the MCS). Alternative URL link and more examples can be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences).
 
 Possible use cases of this might be when dealing with a large set of analogues with changes in R-groups or during large compound screening and search (just as a few examples only, not exhaustive). The main thing I could see from the code below that was to find the MCSs for the input molecules, then use SMARTS strings of the MCSs in order to find atoms not in the MCSs ([GetSubstructMatch()](https://rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.Mol.GetSubstructMatch) part) then highlight that part of the molecules.
-
-```{{python}}
-from rdkit import Chem
-from rdkit.Chem import Draw
-from rdkit.Chem.Draw import IPythonConsole
-from rdkit.Chem import rdFMCS
-from rdkit.Chem.Draw import rdDepictor
-rdDepictor.SetPreferCoordGen(True)
-IPythonConsole.drawOptions.minFontSize=20
-
-def view_difference(mol1, mol2):
-    mcs = rdFMCS.FindMCS([mol1,mol2])
-    mcs_mol = Chem.MolFromSmarts(mcs.smartsString)
-    match1 = mol1.GetSubstructMatch(mcs_mol)
-    target_atm1 = []
-    for atom in mol1.GetAtoms():
-        if atom.GetIdx() not in match1:
-            target_atm1.append(atom.GetIdx())
-    match2 = mol2.GetSubstructMatch(mcs_mol)
-    target_atm2 = []
-    for atom in mol2.GetAtoms():
-        if atom.GetIdx() not in match2:
-            target_atm2.append(atom.GetIdx())
-    return Draw.MolsToGridImage([mol1, mol2],highlightAtomLists=[target_atm1, target_atm2])
-```
 
 <br>
 
@@ -997,7 +924,7 @@ Ring with longer alkyl chain appeared to be in the MCS (as a very general first 
 ###### **Moderate CYP2D6 inhibitors**
 
 ```{python}
-df_2d6_m_inh_p
+#df_2d6_m_inh_p
 ```
 
 ```{python}
@@ -1081,4 +1008,4 @@ Future posts may involve looking at other CYPs, particularly on other inhibitors
 
 ##### **Acknowledgement**
 
-Thanks to every contributor, developer or authors of every software package used in this post, and also the online communities that are behind them. 
+Thanks to every contributor, developer or authors of every software package used in this post, and also the online communities that are behind them. Also, before I forget, the thanks would also be extended to everyone who was involved in the relevant research journal papers mentioned in this post.
