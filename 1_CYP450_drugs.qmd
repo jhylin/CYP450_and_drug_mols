@@ -477,7 +477,8 @@ Draw.MolsToGridImage(
     mols_s3a4, 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs.queryMol) for m in mols_s3a4]
+    legends = list(df_3a4_s_inh_p["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs.queryMol) for m in mols_s3a4]
     )
 ```
 
@@ -500,7 +501,8 @@ Draw.MolsToGridImage(
     mols_s3a4, 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_3a4_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs_80.queryMol) for m in mols_s3a4]
+    legends = list(df_3a4_s_inh_p["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(s3a4_mcs_80.queryMol) for m in mols_s3a4]
     )
 ```
 
@@ -589,7 +591,8 @@ Draw.MolsToGridImage(
     mols_all, 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols_all]
+    legends = list(df_3a4_all["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(all_3a4_mcs_ring.queryMol) for m in mols_all]
     )
 ```
 
@@ -685,7 +688,8 @@ Draw.MolsToGridImage(
     list(df_s3a4_antiv["rdkit_mol"]), 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_s3a4_antiv["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_antiv.queryMol) for m in list(df_s3a4_antiv["rdkit_mol"])]
+    legends = list(df_s3a4_antiv["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(s3a4_antiv.queryMol) for m in list(df_s3a4_antiv["rdkit_mol"])]
     )
 ```
 
@@ -743,7 +747,8 @@ Draw.MolsToGridImage(
     list(df_s3a4_ki["rdkit_mol"]), 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_s3a4_ki["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s3a4_ki.queryMol) for m in list(df_s3a4_ki["rdkit_mol"])]
+    legends = list(df_s3a4_ki["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(s3a4_ki.queryMol) for m in list(df_s3a4_ki["rdkit_mol"])]
     )
 ```
 
@@ -790,7 +795,8 @@ Draw.MolsToGridImage(
     mols_all, 
     subImgSize=(400, 400), 
     molsPerRow=3, 
-    legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_ringMCS.queryMol) for m in mols_all]
+    legends = list(df_3a4_all["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(all_3a4_ringMCS.queryMol) for m in mols_all]
     )
 ```
 
@@ -804,67 +810,55 @@ Draw.MolsToGridImage(
 
 **Non-ring systems**
 
-Thinking about stereochemistry of the molecules, specifically for bonds:
-
-e.g. MCSBondCompare() class
-
-- CheckBondRingMatch()
-
-- **CheckBondStereo()** - used in CompareOrderOutsideRings() class code below
-
-e.g. MCSBondCompareParameter() class
-
-- MatchFusedRings
-
-- CompleteRingsOnly
-
-- **MatchStereo** (to include bond stereo in comparison) - used in CompareOrderOutsideRings() class code below
-
+Class code below were borrowed from RDKit blog post (https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which has explained the code very well already, particularly on why this was done as a custom "class" code and not a "function" one. I just wanted to try the code to see if the MCS would change as suggested.
 
 ```{python}
-# Using CompareOrderOutsideRing class (for bonds) & CompareElementsOutsideRing class (for atoms) to see if MCS changes 
+# I've attempted to add comments to the code below (hopefully not too far off from what they do actually)
 
-# Class code below were borrowed from RDKit blog post (https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explained the code very well already, particularly on why this was done as a custom "class" code and not a usual "function" one
-
-## *might be nice to add further comments to explain the class code*
-
-# Comparing bond orders outside ring systems using rdFMCS's MCSBondCompare
+# Compare bond orders outside ring systems using rdFMCS.MCSBondCompare
+# Using class code that will call a function object
 class CompareOrderOutsideRings(rdFMCS.MCSBondCompare):
 
     def __call__(self, p, mol1, bond1, mol2, bond2):
 
+        # Get bonds 1 and 2 based on bond indices for mols 1 and 2
         b1 = mol1.GetBondWithIdx(bond1)
         b2 = mol2.GetBondWithIdx(bond2)
-
+        # If bonds 1 and 2 are both in ring or if their bond types are the same
         if (b1.IsInRing() and b2.IsInRing()) or (b1.GetBondType() == b2.GetBondType()):
-
+            # If using stereo matching parameter and not checking bond stereo descriptors,
+            # return bonds that are not using stereo matching parameter
             if (p.MatchStereo and not self.CheckBondStereo(p, mol1, bond1, mol2, bond2)):
                 return False
-
+            # If using ring bonds-matching-ring bonds parameter 
+            # return mols/bonds that are part of a ring only
             if p.RingMatchesRingOnly:
                 return self.CheckBondRingMatch(p, mol1, bond1, mol2, bond2)
-
             return True
-
+        # Only match bonds that are not part of ring systems
         return False
 
-# Comparing atom elements outside ring systems using rdFMCS's MCSAtomCompare
+# Compare atom elements outside ring systems using rdFMCS.MCSAtomCompare
 class CompareElementsOutsideRings(rdFMCS.MCSAtomCompare):
 
     def __call__(self, p, mol1, atom1, mol2, atom2):
 
+        # Get atoms 1 and 2 based on atom indices for mols 1 and 2
         a1 = mol1.GetAtomWithIdx(atom1)
         a2 = mol2.GetAtomWithIdx(atom2)
-
+        # If atomic numbers for both atoms are different and the atoms are not in ring systems,
+        # return atoms that instead have the same atomic numbers and in rings systems
         if (a1.GetAtomicNum() != a2.GetAtomicNum()) and not (a1.IsInRing() and a2.IsInRing()):
             return False
-
+        # If using matching atom chirality parameter and not checking both atoms have a chiral tag,
+        # return atoms that are not using the matching atom chirality parameter
         if (p.MatchChiralTag and not self.CheckAtomChirality(p, mol1, atom1, mol2, atom2)):
             return False
-
+        # If using ring bonds-matching-ring bonds parameter,
+        # return mols/atoms that are part of a ring only
         if p.RingMatchesRingOnly:
             return self.CheckAtomRingMatch(p, mol1, atom1, mol2, atom2)
-
+        # Only match ring atoms against ring atoms 
         return True
 
 params_or = rdFMCS.MCSParameters()
@@ -879,11 +873,12 @@ Draw.MolsToGridImage(
     mols_all, 
     subImgSize=(400, 300), 
     molsPerRow=3, 
-    legends = list(df_3a4_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_3a4_orMCS.queryMol) for m in mols_all]
+    legends = list(df_3a4_all["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(all_3a4_orMCS.queryMol) for m in mols_all]
     )
 ```
 
-By using the suggested CompareOrderOutsideRings() and CompareElementsOutsideRings() classes, the MCS has indeed become larger, where a full ring was highlighted as the MCS.
+By using the suggested class code above, the MCS has indeed become larger, where a full ring was highlighted as the MCS.
 
 <br>
 
@@ -911,7 +906,8 @@ Draw.MolsToGridImage(
     mols_s2d6, 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_2d6_s_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(s2d6_mcs.queryMol) for m in mols_s2d6]
+    legends = list(df_2d6_s_inh_p["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(s2d6_mcs.queryMol) for m in mols_s2d6]
     )
 ```
 
@@ -937,7 +933,8 @@ Draw.MolsToGridImage(
     mols_m2d6, 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_2d6_m_inh_p["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(m2d6_mcs.queryMol) for m in mols_m2d6]
+    legends = list(df_2d6_m_inh_p["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(m2d6_mcs.queryMol) for m in mols_m2d6]
     )
 ```
 
@@ -970,7 +967,8 @@ Draw.MolsToGridImage(
     mols_all_2d6, 
     subImgSize=(400, 300), 
     molsPerRow=2, 
-    legends = list(df_2d6_all["pref_name"]), highlightAtomLists=[m.GetSubstructMatch(all_2d6_mcs.queryMol) for m in mols_all_2d6]
+    legends = list(df_2d6_all["pref_name"]), 
+    highlightAtomLists=[m.GetSubstructMatch(all_2d6_mcs.queryMol) for m in mols_all_2d6]
     )
 ```
 
