@@ -2,7 +2,7 @@
 title: "Cytochrome P450 and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-8-8'
+date: '2024-8-15'
 draft: true
 categories: 
     - Metabolism
@@ -17,7 +17,28 @@ format: html
 bibliography: references.bib
 ---
 
+##### **Outline**
+
+- Small introduction on drug toxicology and metabolism regarding cytochrome P450s (CYPs)
+    - more on drug structural alerts
+    - more on CYPs and ADMET
+- Data extraction using chembl_downloader
+- Data import and preprocessing
+- Quick check on structural validites
+- Further look into duplicated structures and stereochemistries
+    - quinidine
+    - itraconazole
+- Maximum common substructures (**need to revise and shorten**)
+    - CYP3A4 inhibitors
+    - CYP2D6 inhibitors
+- Some small findings and possible future work
+- Acknowledgement
+
+<br>
+
 ##### **Some introductions**
+
+*check tenses*
 
 I initially wanted to work on something about drug toxicology without setting any goals or intentions on how this post would end (basically doing this as a free-style post) and currently I felt it would be more to do with metabolism, which was also directly linked to drug toxicity, an important area not to ignore during any therapeutic drug discovery and developmental work.
 
@@ -457,6 +478,8 @@ Some code examples to refer to:
 
 ###### **Strong CYP3A4 inhibitors**
 
+*To revise and shorten*
+
 ```{python}
 # Get list of RDKit mols
 mols_s3a4 = list(df_3a4_s_inh_p["rdkit_mol"])
@@ -533,7 +556,7 @@ I just happend to spot a small code error above, so the MCS for moderate CYP3A4 
 
 <br>
 
-###### **Combining moderate and strong CYP3A4 inhibitors**
+###### **All CYP3A4 inhibitors**
 
 Added in moderate CYP3A4 inhibitors to see if MCS changes.
 
@@ -596,6 +619,8 @@ m3a4_mcs.queryMol
 <br>
 
 ###### **Looking at each drug class within strong CYP3A4 inhibitors**
+
+*Shorten/remove this part*
 
 There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (e.g. ceritinib, tucatinib, idelalisib, ribociclib) in the strong CYP3A4 inhibitor cohort. For people unfamiliar with these drugs, ChEMBL database do have "drug indications" recorded for each approved drug that you might be able to use to deduce what each drug was used for. The "drug indications" could be added into the SQL query at the beginning so that it'd be included into the dataframes (my old role happened to help here, so I kind of didn't need to do this).
 
@@ -907,7 +932,7 @@ Both aromatic and non-aromatic rings (fused ones also included) were shown here 
 
 <br>
 
-###### **Combining moderate & strong CYP2D6 inhibitors**
+###### **All CYP2D6 inhibitors**
 
 ```{python}
 # Concatenate dfs for moderate & strong CYP2D6 inhibitors
