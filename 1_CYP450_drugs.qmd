@@ -19,9 +19,13 @@ bibliography: references.bib
 
 ##### **Outline**
 
-- Small introduction on drug toxicology and metabolism regarding cytochrome P450s (CYPs)
-    - more on drug structural alerts
-    - more on CYPs and ADMET
+Main goal for this post is to have a preliminary look into two of the most common groups of cytochrome P450 (CYPs)inhibitors with an initial aim to look for any maximum common substructures if present or applicable.
+
+Below is a general outline of the post:
+
+- Small introduction on drug toxicology and metabolism regarding CYPs
+    - more on drug structural alerts in ChEMBL (citing data sources)
+    - more on CYPs and ADMET (just a thought on another drug metabolism data source)
 - Data extraction using chembl_downloader
 - Data import and preprocessing
 - Quick check on structural validites
@@ -38,43 +42,41 @@ bibliography: references.bib
 
 ##### **Some introductions**
 
-*check tenses*
+I initially want to work on something about drug toxicology without setting any goals or intentions on how this post will end (bit like a free-style post) and currently I feel it will be more to do with metabolism, which is also directly linked to drug toxicity, an important area not to ignore during any therapeutic drug discovery and developmental work.
 
-I initially wanted to work on something about drug toxicology without setting any goals or intentions on how this post would end (basically doing this as a free-style post) and currently I felt it would be more to do with metabolism, which was also directly linked to drug toxicity, an important area not to ignore during any therapeutic drug discovery and developmental work.
-
-This post was sort of inspired by a recent commentary that talked about "avoidome" and DMPK-related proteins to avoid [@Fraser2024]. I also happened to encounter two other blog posts ([a post from D. Lowe](https://www.science.org/content/blog-post/john-keats-would-word), and [another one from P. Kenny](https://fbdd-lit.blogspot.com/2024/03/)) that have provided reviews on this commentary recently with interesting view points.
+This post is sort of inspired by a recent commentary that talks about "avoidome" and DMPK-related proteins to avoid [@Fraser2024]. I also happen to encounter two other blog posts ([a post from D. Lowe](https://www.science.org/content/blog-post/john-keats-would-word), and [another one from P. Kenny](https://fbdd-lit.blogspot.com/2024/03/)) that have provided reviews on this commentary recently with interesting view points.
 
 In a very rough sense, three main areas have been looked at (not exhaustive) with the aim to create safer therapeutic drugs: 
 
-1. **Structural alerts** on compound substructures that were known to cause adverse drug effects or pan-assay interference compounds (PAINs)
+1. **Structural alerts** on compound substructures that are known to cause adverse drug effects or pan-assay interference compounds (PAINs)
 
-    Many have looked into structural alerts (an example repo: [rd_filters](https://github.com/PatWalters/rd_filters)). ChEMBL database has already had a cheminformatic utils web service developed that provided structural alert computations for compounds. There were most likely much more efforts than these ones.
+    Many have looked into structural alerts (an example repo: [rd_filters](https://github.com/PatWalters/rd_filters)). ChEMBL database has already had a cheminformatic utils web service developed that provides structural alert computations for compounds. There are most likely much more efforts than these ones.
 
-2. Toxicophores in relation to **human ether-a-go-go-related gene (hERG) potassium channel** (this might be similar to the first one actually)
+2. Toxicophores in relation to **human ether-a-go-go-related gene (hERG) potassium channel** (this may be similar to the first one actually)
 
-    hERG potassium channel was also another frequently-looked-at aspect for drug toxicology due to its known effect leading to cardiac QT prolongations or more commonly known as arrhythmias [@Curran1995].
+    hERG potassium channel is also another frequently-looked-at aspect for drug toxicology due to its known effect leading to cardiac QT prolongations or more commonly known as arrhythmias [@Curran1995].
 
 3. **Cytochrome P450 enzymes** (CYP450, CYP isoenzymes, CYP or CYPs), the well-known ones were CYP3A4, 2D6, 1A2, 2C9 and 2C19
 
-    CYP450 enzymes played a key role in the metabolism and toxicology parts of the ADMET process of drugs. 
+    CYP450 enzymes play a key role in the metabolism and toxicology parts of the ADMET process of drugs. 
 
     When a drug behaves like a cytochrome inhibitor, it inhibits the activity of a particular cytochrome enzyme e.g. CYP3A4 leading to a reduction of clearance of a particular therapeutic drug e.g. a CYP3A4 substrate such as apixaban, thus increasing its plasma concentration *in vivo* causing a higher chance of adverse effect (which in the context of apixaban, this means the poor person taking the apixaban may get excessive bleeding...).
 
-    My very inital naive thought was that if we could at least cover some of the drug toxicology part during drug design and discovery process, this might be able to save some resources along the way (obviously it won't be this simple...).
+    My very inital naive thought is that if we could at least cover some of the drug toxicology part during drug design and discovery process, this may be able to save some resources along the way (obviously it won't be this simple...).
     
-    Nevertheless, it might still be useful and interesting to look into the relationship between CYP450 and small drug molecules to see if there were anything worth further explorations. This post would start with the two largest groups of CYP inhibitors, so focussing on CYP3A4 and 2D6 first.
+    Nevertheless, it may still be useful and interesting to look into the relationship between CYP450 and small drug molecules to see if there are anything worth further explorations. This post will start with the two largest groups of CYP inhibitors, so focussing on CYP3A4 and 2D6 first.
 
-Other useful categories involved drug-induced skin sensitisations and liver injuries and more.
+Other useful categories involve drug-induced skin sensitisations and liver injuries and more.
 
-While my focus was only on a very small cohort of small molecules relating to only two CYPs, it was also worth noting that there were actually more CYPs present as well, for example, CYP1A1, 2A6, 2B6, 2C8, 2E1, 2J2, 3A5 (note: amlodipine was a moderate CYP3A5 inhibitor and would be looked at below), 3A7 and 4F2 [@Guengerich2021]. The cited paper here also provided quite a comprehensive background on the history of CYP450 and their relevance to toxicities in drugs, so I won't repeat them here.
+While my focus is only on a very small cohort of small molecules relating to only two CYPs, it is also worth noting that there are actually more CYPs present as well, for example, CYP1A1, 2A6, 2B6, 2C8, 2E1, 2J2, 3A5 (note: amlodipine is a moderate CYP3A5 inhibitor and will be looked at below), 3A7 and 4F2 [@Guengerich2021]. The cited paper here also provides quite a comprehensive background on the history of CYP450 and their relevance to toxicities in drugs, so I won't repeat them here.
 
 <br>
 
 ###### **More on structural alerts**
 
-I was only really curious about the data sources  used to build these ChEMBL structural alerts, so below were some of my notes on these sources.
+I am only really curious about the data sources used to build these ChEMBL structural alerts, so below are some of my notes on these sources.
 
-From ChEMBL 20, only 6 filters were present, as shown by this [ChEMBL blogpost](http://chembl.blogspot.com/2015/02/chembl-20-released.html) - it might appear that this blog post cited all 8 filters but in fact it only had 6.
+From ChEMBL 20, only 6 filters are present, as shown by this [ChEMBL blogpost](http://chembl.blogspot.com/2015/02/chembl-20-released.html) - it may appear that this blog post cites all 8 filters but in fact it only has 6.
 
 * [Pfizer LINT filters](https://www.eurekaselect.com/article/24760)
 
@@ -82,27 +84,27 @@ From ChEMBL 20, only 6 filters were present, as shown by this [ChEMBL blogpost](
 
 * [BMS HTS Deck Filters](https://pubs.acs.org/doi/10.1021/ci050504m)
 
-* [NIH MLSMR Excluded Functionality Filters](https://www.yumpu.com/en/document/read/12367541/mlsmr-excluded-functionality-filters-nih-molecular-libraries-) (the old link provided in the old ChEMBL blog post was no longer available, this was found via [KNIME's REOS Tagger webpage](https://hub.knime.com/knime/spaces/Examples/00_Components/Life%20Sciences/REOS%20Tagger~bWMuzeSbFgbCrLWA/current-state))
+* [NIH MLSMR Excluded Functionality Filters](https://www.yumpu.com/en/document/read/12367541/mlsmr-excluded-functionality-filters-nih-molecular-libraries-) (the old link provided in the old ChEMBL blog post is no longer available, this is found via [KNIME's REOS Tagger webpage](https://hub.knime.com/knime/spaces/Examples/00_Components/Life%20Sciences/REOS%20Tagger~bWMuzeSbFgbCrLWA/current-state))
 
 * [University of Dundee NTD Screening Library Filters](https://chemistry-europe.onlinelibrary.wiley.com/doi/10.1002/cmdc.200700139) (also known as "Brenk filter" in RDKit)
 
 * [PAINS filters](https://pubs.acs.org/doi/10.1021/jm901137j)
 
-From ChEMBL 20 to 23, there were 8 filters in total (agreed with rd_filters' README.md that there weren't many documentations about this in ChEMBL, because I did try to search for this on ChEMBL but nothing in details were found), the sources of the two additional ones were as follow:
+From ChEMBL 20 to 23, there are 8 filters in total (agreed with rd_filters' README.md that there aren't many documentations about this in ChEMBL, as I've tried to search for this on ChEMBL but nothing in details are found), the sources of the two additional ones are as follow:
 
-* Inpharmatica - unable to find direct source initially then I found out later that this was obtained through private communications between ChEMBL and Inpharmatica Ltd. in the earlier days as I went for more online searches (a bit of a convoluted process involving a few different key words...) and finally I came across an older ChEMBL presentation on ChEMBL 09 which mentioned about this, and also this was further elaborated by this paper [@chembl2017]
+* Inpharmatica - unable to find direct source initially then I've found out later that this has been obtained through private communications between ChEMBL and Inpharmatica Ltd. in the earlier days. An older ChEMBL presentation on ChEMBL 09 mentions about this, and this is also further elaborated by this paper [@chembl2017]
 
 * [SureChEMBL](https://chembl.gitbook.io/surechembl/chemical-search/smarts-search) (old link provided by the paper [@chembl2017] also no longer exists)
 
-RDKit (section on ["Filtering unwanted substructures"](https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures)) also has another NIH filter based on two other references [@Jadhav2010] and [@Doveston2015]. At one point I was so confused with this NIH filter here and the NIH MLSMR one above... I thought they were the same but when I looked further they cited different papers actually. 
+RDKit (section on ["Filtering unwanted substructures"](https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures)) also has another NIH filter based on two other references [@Jadhav2010] and [@Doveston2015]. At one point I'm so confused with this NIH filter here and the NIH MLSMR one above... they are actually different as different papers are cited actually. 
 
-RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](https://www.rdkit.org/docs/source/rdkit.Chem.rdfiltercatalog.html#rdkit.Chem.rdfiltercatalog.FilterCatalogParams.FilterCatalogs) class currently. Brenk filter seems to be the same as the CHEMBL_Dundee one since both of them quoted the same journal paper as reference. It's also got a ZINC one I think. 
-
-Before I get very carried away, I'll stop searching for every structural alerts papers here as there are many in the literatures.
+RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](https://www.rdkit.org/docs/source/rdkit.Chem.rdfiltercatalog.html#rdkit.Chem.rdfiltercatalog.FilterCatalogParams.FilterCatalogs) class currently. Brenk filter seems to be the same as the CHEMBL_Dundee one since both of them have quoted the same journal paper as reference. It's also got a ZINC one I think. Before I get very carried away, I'll stop searching for every structural alerts papers here as there are many in the literatures.
 
 <br>
 
 ###### **More on CYPs and ADMET**
+
+**check tenses**
 
 A bit of a sidetrack for this part (feel free to skip) as I came across a new paper online recently about using deep learning model for ADMET prediction and the data source used by this paper was from Therapeutics data commons (TDC). So while I was working on this relevant topic of CYP, metabolism and toxicology of the ADMET, I thought to dig a bit deeper to see what sort of data were used by TDC.
 
