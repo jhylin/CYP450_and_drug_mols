@@ -104,29 +104,27 @@ RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](
 
 ###### **More on CYPs and ADMET**
 
-**check tenses**
+A bit of a sidetrack for this part (feel free to skip) as I come across a new paper online recently about using deep learning model for ADMET prediction which uses data from Therapeutics data commons (TDC). So while working on this relevant topic of CYP and ADMET (only the metabolism and toxicology parts), I just want to dig a bit deeper to see what sort of data are used by TDC.
 
-A bit of a sidetrack for this part (feel free to skip) as I came across a new paper online recently about using deep learning model for ADMET prediction and the data source used by this paper was from Therapeutics data commons (TDC). So while I was working on this relevant topic of CYP, metabolism and toxicology of the ADMET, I thought to dig a bit deeper to see what sort of data were used by TDC.
-
-The [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism), specifically the metabolism one on all five CYP isoenzymes (CYP2C19, 2D6, 3A4, 1A2 and 2C9), were all derived from a 2009 paper by [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). I just wanted to have a closer look at this paper to see if there were any detailed lists of molecules used in their *in vitro* testings, but unfortunately (unless I missed something there...), it seemed there were only mentions of:
+The [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism), specifically the metabolism one on all five CYP isoenzymes (CYP2C19, 2D6, 3A4, 1A2 and 2C9), are all derived from a 2009 paper by [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). A closer look at this paper only seems to only mention:
 
 > ...we tested 17,143 samples at between seven and fifteen concentrations for all five CYP isozymes. The samples consisted of 8,019 compounds from the MLSMR including compounds chosen for diversity and rule-of-five compliance, 16 synthetic tractability, and availability; 6,144 compounds from a set of biofocused libraries which included 1,114 FDA-approved drugs; and 2,980 compounds from combinatorial libraries containing privileged structures targeted at GPCRs and kinases, and libraries of purified natural products or related structures...
 
-If I went to its original journal paper site (the link provided was a NCBI one), there was only one additional Excel file with a long list of chemical scaffolds showing different CYP activities (no other supplementary information I could spot there). The only likely lists of compounds tested were shown in its figures 6 and 7 in the paper, where figure 7 was more relevant for drug-drug interactions. I then realised the proportions of FDA-approved drugs used and the rest of the molecules tested in this paper were also not very balanced (thinking along the line of approved drugs and non-approved drugs), and noticed that what they were saying in its discussion about how they were not noticing the usual prominent activities of CYP3A4 and 2D6 in the compounds they've tested:
+If I go to its original journal paper site (the link provided was a NCBI one), there is only one additional Excel file with a long list of chemical scaffolds showing different CYP activities (no other supplementary information I can spot there). The only likely lists of compounds tested are shown in its figures 6 and 7 in the paper, where figure 7 is more relevant for drug-drug interactions. I then realise the proportions of FDA-approved drugs used and the rest of the molecules tested in this paper are also not very balanced (thinking along the line of approved drugs and non-approved drugs), and notice that what they are saying in its discussion about how they are not noticing the usual prominent activities of CYP3A4 and 2D6 in the compounds they've tested:
 
 > ...It has been suggested that CYP 3A4 is the most prominent P450 isozyme in drug metabolism and hepatic distribution (Fig. 2b),^25^^,^ ^26^ but the drugs in our collection do not appear to have been optimized away from this activity. There has also been speculation that CYP 2D6 isozyme plays a prominent role in drug metabolism,^27^ but no difference in activity was observed between diversity compounds and approved drugs for this isozyme...
 
-Well, it might be due to the imbalanced set of compounds used e.g. number of FDA-approved drug (smaller) vs. number of other compounds from other libraries (larger).
+Well, it may be due to the imbalanced set of compounds used e.g. number of FDA-approved drug (smaller) vs. number of other compounds from other libraries (larger).
 
-I also went to FDA's website to look at how the CYP stories were compiled ([the FDA link](https://www.fda.gov/drugs/drug-interactions-labeling/drug-development-and-drug-interactions-table-substrates-inhibitors-and-inducers)). I've also noticed that *in vitro* inhibitors and clinical index inhibitors might not be completely the same across the CYPs. There were some overlappings in CYP3A4/5 and 2D6 for sure but definitely not exactly the same across all of the documented CYP isoenzymes in the FDA webpage. 
+I've also visited FDA's website to look at how the CYP stories are compiled ([FDA link](https://www.fda.gov/drugs/drug-interactions-labeling/drug-development-and-drug-interactions-table-substrates-inhibitors-and-inducers)). The *in vitro* inhibitors and clinical index inhibitors are not completely the same across all the CYPs. There are some overlappings in CYP3A4/5 and 2D6 for sure but definitely not exactly the same across all the documented CYPs in this FDA webpage. 
 
-So back to this new paper on predicting ADMET... how likely will it be useful in real-life hit/lead ADMET optimisation projects in drug discovery settings if the data source only involved a larger portion of non-approved drugs versus a smaller portion of actual FDA-approved drugs? It just shows that there are a lot of things to think about in the DMPK/ADMET areas in drug discovery pipelines, as ultimately this is crucial to see if a candidate molecule will proceed or not (i.e. causing toxicity or not and whether it's tolerable side effects or adverse and even life-threatening ones instead).
+So back to this new paper on predicting ADMET... how likely will it be useful in real-life hit/lead ADMET optimisation projects in drug discovery settings if the data source only involves a larger portion of non-approved drugs versus a smaller portion of actual FDA-approved drugs?... It just shows that there are a lot of things to think about in the DMPK/ADMET areas within drug discovery pipelines, as ultimately this is crucial to see if a candidate molecule will proceed or not (i.e. causing toxicity or not and whether it's tolerable side effects or adverse or even life-threatening ones instead).
 
 <br>
 
 ##### **Extracting data**
 
-Importing the following packages first.
+First step here is to import the following software packages in order to retrieve and work with ChEMBL data (again).
 
 ```{python}
 import pandas as pd
@@ -149,19 +147,19 @@ latest_version = latest()
 print(f"The latest ChEMBL version is: {latest_version}")
 ```
 
-I'm using SQL via chembl_downloader again to download approved drugs with their ChEMBL ID and equivalent canonical SMILES. All of the CYP3A4 and 2D6 inhibitors extracted from ChEMBL are based on the [Flockhart table of drug interactions](https://drug-interactions.medicine.iu.edu/MainTable.aspx) [@Flockhart2021].
+I'm using SQL via chembl_downloader to download approved drugs with their ChEMBL ID and equivalent canonical SMILES. All of the CYP3A4 and 2D6 inhibitors extracted from ChEMBL are based on the [Flockhart table of drug interactions](https://drug-interactions.medicine.iu.edu/MainTable.aspx) [@Flockhart2021].
 
-Note: Three other categories of medicines were not going to be looked at for now, which were the weak inhibitors, ones with *in vitro* evidence only and ones that were still pending reviews.
+Note: Three other categories of medicines are not going to be looked at for now, which are the weak inhibitors, ones with *in vitro* evidence only and ones that are still pending reviews.
 
-A bit about retrieving data here, the following might not be the best way to get the data, but I've somehow incorporated chembl_downloader into my own small piece of function code to retrieve SMILES of approved drugs. Earlier on, I was repeating SQL queries and thought to improve them by using a function code instead (see Python script named as "cyp_drugs.py" in the [repo](https://github.com/jhylin/CYP450_and_drug_mols)). It removed a large chunk of SQL query string every time when trying to get different CYP inhibitors, leaving only approved drug names so it might be easier to read and understand.
+A bit about retrieving data here, the following may not be the best way to get the data, but I've somehow incorporated chembl_downloader into my own small piece of function code (see Python script named as "cyp_drugs.py" in the [repo](https://github.com/jhylin/CYP450_and_drug_mols)) to retrieve SMILES of approved drugs (other public databases may also work very well equally, but I'm used to using ChEMBL due to its nice way of arranging information). 
 
-Another possible way was to use get_target_sql(), e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appeared that there were no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an [example link for CYP2D6 in ChEMBL](https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D)). The Flockhart table has clearly annotated each approved drug with journal paper citations so I decided to stick with the previous method.
+Another possible way is to use get_target_sql() within chembl_downloader, e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an [example link for CYP2D6 in ChEMBL](https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D)). The Flockhart table has clearly annotated each approved drug with journal paper citations so I decide to stick with the previous method.
 
 ```{python}
-## Main issue previously was with sql string - too many quotation marks!
+## Main issue previously is with sql string - too many quotation marks!
 # e.g. WHERE molecule_dictionary.pref_name = '('KETOCONAZOLE', 'FLUCONAZOLE')'': near "KETOCONAZOLE": syntax error
-# Resolved by adding string methods e.g. strip() and replace() to sql query string
-# function code used chembl_downloader code as reference since it has no particular function to select drugs this way yet
+# Resolved issue by adding string methods e.g. strip() and replace() to sql query string
+
 from cyp_drugs import chembl_drugs
 
 # Get a list of strong cyp3a4 inhibitors
@@ -202,19 +200,19 @@ df_2d6_mod_inh = chembl_drugs(
 df_2d6_mod_inh
 ```
 
-Initially, four categories of approved drugs were retrieved - both strong and moderate CYP3A4 inhibitors, and also the strong and moderate CYP2D6 inhibitors. CYP3A4 inhibitors were the largest cohort of all the cytochrome inhibitors known so far (based on clinical documentations). 
+Initially, four categories of approved drugs are retrieved - both strong and moderate CYP3A4 inhibitors, and also the strong and moderate CYP2D6 inhibitors. CYP3A4 inhibitors are the largest cohort of all the cytochrome inhibitors known so far (based on clinical documentations). 
 
 <br>
 
 ##### **Import and preprocess data**
 
 ```{python}
-## Tried using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 (all latest major versions, 
+## When using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 (all latest major versions, 
 # note: rdkit has a latest minor release as 2024.03.4, which includes a patch for numpy 2.0)
-# Seemed to work as a new df was generated but with some error messages shown though
+# Seems to work as a new df is generated but with error messages shown though
 
-## Eventually used downgraded versions of pandas and numpy instead 
-# - confirmed that pandas 2.1.4, numpy 1.26.4 & rdkit 2024.3.1 worked with no error messages generated as output
+## Eventually using downgraded versions of pandas and numpy instead 
+# pandas 2.1.4, numpy 1.26.4 & rdkit 2024.3.1 work with no error messages generated as output
 
 # preprocess canonical smiles 
 from mol_prep import preprocess
@@ -250,7 +248,7 @@ df_2d6_m_inh_p.head()
 
 ##### **Images of structures**
 
-Main thing was to check structural validities.
+Here what I'm trying to do is to check structural validities of all the drug molecules, and one of the easiest things to do is to look at their chemical structures directly.
 
 ```{python}
 # moderate cyp2d6 inhibitors
@@ -274,19 +272,20 @@ Draw.MolsToGridImage(
 
 <br>
 
-###### **Looking into duplicated structures and stereochemistries**
+###### **Duplicated structures and stereochemistries**
 
-I had a feeling looking into stereochemistries might not be needed for now but as a fun exercise, I should, so below was a small section on looking at two drugs with duplicated entries more closely with their stereochemistries.
+This is a small detour while checking structural validities due to the presence of two duplicated drug molecules, and since these two molecules consist of some stereocentres, I'm going to have a look at their stereochemistries. 
 
 <br>
 
 ###### **quinidine**
 
-Different stereochemistries between the two quinidines were spotted.
+There are different stereochemistries spotted in the two quinidines shown below.
 
 ```{python}
 # Stereochem in RDKit
-# Older approach - AssignStereochemistry() -> this is used in datamol's standardize_mol()
+# Older approach - AssignStereochemistry() -> this is used in datamol's standardize_mol(), 
+# which is used in my small mol_prep.py script
 # Newer approach - FindPotentialStereo()
 ```
 
@@ -326,12 +325,10 @@ rdCIPLabeler.AssignCIPLabels(quinidine_4)
 quinidine_4
 ```
 
-Quinidine had 4 defined atom stereocentre count as per PubChem compound summary (as one of possible references for cross-checking) - this was based on the calculation for [CHEMBL1294](https://pubchem.ncbi.nlm.nih.gov/compound/441074#section=Computed-Properties&fullscreen=true), which was the same as the quinidine spotted at index row 4.
-
-Dropping the quinidine at index row 3 for now.
+Quinidine has 4 defined atom stereocentre count as per PubChem compound summary (as one of possible references for cross-checking) - this is based on the calculation for [CHEMBL1294](https://pubchem.ncbi.nlm.nih.gov/compound/441074#section=Computed-Properties&fullscreen=true), which is the same as the quinidine spotted at index row 4. So I'm dropping the quinidine at index row 3 for now.
 
 ```{python}
-# Note: old index unchanged for now (re-index later if needed)
+# Note: old index is unchanged for now (re-index later if needed)
 df_2d6_s_inh_p = df_2d6_s_inh_p.drop(labels = 3)
 df_2d6_s_inh_p
 ```
@@ -340,10 +337,10 @@ df_2d6_s_inh_p
 
 ###### **itraconazole**
 
-Two itraconazoles were found to check for stereochemistries.
+Two itraconazoles are also found with different stereochemistries.
 
 ```{python}
-df_3a4_s_inh_p
+#df_3a4_s_inh_p
 ```
 
 ```{python}
@@ -377,26 +374,15 @@ rdCIPLabeler.AssignCIPLabels(itracon_5)
 itracon_5
 ```
 
-Clearly, even if the SMILES of these two itraconzoles were not converted into RDKit molecules, we could probably tell one of them had stereochemistries and the other molecule was without due to the presence of "@" in the SMILES string for the one at index row 4. So the output images showed exactly that - one with chiral centres, where the other did not have any.
+Clearly, even if the SMILES of these two itraconzoles are not converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other one is without due to the presence of "@" in the SMILES string for the one at index row 4. The output images shows exactly that - one with chiral centres, where the other does not have any.
 
-PubChem calculations however generated different result for itraconazole. It seemed it only had one defined atom stereocentre count and two undefined stereocentre counts ([PubChem reference](https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true)).
+PubChem calculations have however generated different result for itraconazole. It seems it only has one defined atom stereocentre count and two undefined stereocentre counts ([PubChem reference](https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true)).
 
-I've also noted that the two itraconzoles obtained from ChEMBL had different ChEMBL ID numbers (ChEMBL ID: CHEMBL22587 and CHEMBL64391) to the one calculated in PubChem (ChEMBL ID: CHEMBL224725). So below I've looked into CHEMBL224725 first.
+I've also noted that the two itraconzoles obtained from ChEMBL have different ChEMBL ID numbers (ChEMBL IDs: CHEMBL22587 and CHEMBL64391) to the one calculated in PubChem (ChEMBL ID: CHEMBL224725). So below I've looked into CHEMBL224725 first.
 
-```{python}
-# canonical smiles of another itraconzole ChEMBL ID as CHEMBL224725
-# CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5COC(Cn6cncn6)(c6ccc(F)cc6F)O5)cc4)CC3)cc2)c1=O
+Then I realise that if I search for "itraconazole" directly in ChEMBL, only four entries will appear with ChEMBL IDs of CHEMBL64391, CHEMBL22587, CHEMBL882 and CHEMBL5090785, and there is no ChEMBL224725. This is all due to a small spelling error (which is most likely a typo by accident) of itraconazole - being spelled as "itraconzole", which is also carried over into PubChem as well. I have double checked to make sure both "itraconzole" and the usual itraconazole are referring to the same chemical structure. Below are some screenshots showing the typo. ![Screenshot of "itraconzole" in ChEMBL database](chembl_itracon.png) ![Screenshot of "itraconzole" in PubChem that was inherited from ChEMBL](pubchem_itracon.png) 
 
-# itracon_x = Chem.MolFromSmiles("CCC(C)n1ncn(-c2ccc(N3CCN(c4ccc(OC[C@H]5COC(Cn6cncn6)(c6ccc(F)cc6F)O5)cc4)CC3)cc2)c1=O")
-# rdCIPLabeler.AssignCIPLabels(itracon_x)
-# itracon_x
-
-# note: itracon_x = itracon_6 (later added)
-```
-
-Well, I've just found out that if I searched for "itraconazole" directly in ChEMBL, only four entries appeared with ChEMBL IDs of CHEMBL64391, CHEMBL22587, CHEMBL882 and CHEMBL5090785, and there was no ChEMBL224725. Then I noticed a spelling error (which was most likely a typo by accident) of itraconazole as "itraconzole", which was actually carried over into PubChem as well. I did double check to make sure both "itraconzole" and the usual itraconazole were referring to the same chemical structure. Below were some screenshots showing the typo. ![Screenshot of "itraconzole" in ChEMBL database](chembl_itracon.png) ![Screenshot of "itraconzole" in PubChem that was inherited from ChEMBL](pubchem_itracon.png) 
-
-So to add this likely-mis-spelled "itraconzole" into the dataframe, I literally added it into the SQL query above when obtaining drug information through chembl_downloader.
+So to add this likely-mis-spelled "itraconzole" into the dataframe, I literally add it into the SQL query above when obtaining drug information through chembl_downloader.
 
 ```{python}
 # SMILES of new addition - "itraconzole"
@@ -410,7 +396,7 @@ rdCIPLabeler.AssignCIPLabels(itracon_6)
 itracon_6
 ```
 
-There was only one stereocentre for "itraconzole", which would match the CHEMBL224725 entry for "itraconzole" in PubChem. Without looking into other cross-referencing sources, and if only sticking with PubChem for now, I then went back to check all 3 (stereochemically-)different versions of itraconazole and found that the RDKit stereochemical calculations of these 3 itraconazoles had all basically matched their equivalent PubChem computations for atom sterecentre counts.
+There is only one stereocentre for "itraconzole", which will match the CHEMBL224725 entry for "itraconzole" in PubChem. Without looking into other cross-referencing sources, and if only sticking with PubChem for now, I've then gone back to check all 3 (stereochemically-)different versions of itraconazole and found that the RDKit stereochemical calculations of these 3 itraconazoles have all basically matched their equivalent PubChem computations for atom sterecentre counts.
 
 [CHEMBL22587 - PubChem CID 55283](https://pubchem.ncbi.nlm.nih.gov/compound/55283#section=Computed-Properties&fullscreen=true) - 2 defined, 1 undefined atom stereocentre count 
 
@@ -430,14 +416,14 @@ itracon_5
 itracon_6
 ```
 
-Dataframe of df_3a4_s_inh_p containing 3 different itraconazoles was then updated below to remove two of the triplicated entries.
+Dataframe of df_3a4_s_inh_p containing 3 different itraconazoles is then updated below to remove two of the triplicated entries.
 
 ```{python}
 # Preprocessed df of strong cyp3a4 inhibitors
 df_3a4_s_inh_p
 ```
 
-Keeping the one with max phase marked as 4.0 (the other two had "NaN" and had no relevant medical or therapeutic indications data documented in PubChem).
+I'm keeping the one with max phase marked as 4.0 (due to the other two having "NaN" with no relevant medical or therapeutic indications data documented in PubChem).
 
 ```{python}
 # Note old index unchanged (re-index later if needed)
@@ -459,6 +445,8 @@ Draw.MolsToGridImage(
 <br>
 
 ##### **Maximum common substructures**
+
+**check tenses**
 
 Maximum common substructures (MCS) might be interesting to look at for these CYP inhibitors.
 
