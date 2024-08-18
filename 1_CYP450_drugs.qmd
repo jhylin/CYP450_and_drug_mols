@@ -2,7 +2,7 @@
 title: "Cytochrome P450 and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-8-15'
+date: '2024-8-18'
 draft: true
 categories: 
     - Metabolism
@@ -19,7 +19,7 @@ bibliography: references.bib
 
 ##### **Outline**
 
-Main goal for this post is to have a preliminary look into two of the most common groups of cytochrome P450 (CYPs)inhibitors with an initial aim to look for any maximum common substructures if present or applicable.
+Main goal for this post is to have a preliminary look into two of the most common groups of cytochrome P450 (CYPs) inhibitors with an initial aim to look for any maximum common substructures if present or applicable.
 
 Below is a general outline of the post:
 
@@ -36,7 +36,7 @@ Below is a general outline of the post:
     - CYP3A4 inhibitors
     - CYP2D6 inhibitors
 - Some small findings and possible future work
-- Acknowledgement
+- Acknowledgements
 
 <br>
 
@@ -420,7 +420,7 @@ Dataframe of df_3a4_s_inh_p containing 3 different itraconazoles is then updated
 
 ```{python}
 # Preprocessed df of strong cyp3a4 inhibitors
-df_3a4_s_inh_p
+df_3a4_s_inh_p.head(10)
 ```
 
 I'm keeping the one with max phase marked as 4.0 (due to the other two having "NaN" with no relevant medical or therapeutic indications data documented in PubChem).
@@ -429,7 +429,7 @@ I'm keeping the one with max phase marked as 4.0 (due to the other two having "N
 # Note old index unchanged (re-index later if needed)
 # Dropping itraconazole at index rows 4 & 6
 df_3a4_s_inh_p = df_3a4_s_inh_p.drop(labels = [4, 6])
-df_3a4_s_inh_p
+df_3a4_s_inh_p.head(10)
 ```
 
 ```{python}
@@ -446,29 +446,27 @@ Draw.MolsToGridImage(
 
 ##### **Maximum common substructures**
 
-**check tenses**
+Maximum common substructures (MCS) is something I'm interested in trying out so below are some examples of finding MCS in these CYP inhibitors.
 
-Maximum common substructures (MCS) might be interesting to look at for these CYP inhibitors.
+Below are some information regarding MCS in RDKit:
 
-Regarding MCS in RDKit:
+* [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) is for 2 or more mols and returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
 
-* [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) was for 2 or more mols and returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
-
-* RascalMCES (maximum common edge substructures) was for 2 mols only and returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talked about this in more details
+* RascalMCES (maximum common edge substructures) is for 2 mols only and returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details
 
 Some code examples to refer to:
 
-* A [RDKit code example](https://rdkit.org/docs/GettingStartedInPython.html#findmcs) might be a good starting point to learn about MCS.
+* A [RDKit code example](https://rdkit.org/docs/GettingStartedInPython.html#findmcs) may be a good starting point to learn about MCS.
 
-* [TeachOpenCADD's MCS talktorial](https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html) - a nice tutorial-like piece that was good for learning as it introduced and explained MCS and FMCS algorithm
+* [TeachOpenCADD's MCS talktorial](https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html) - a nice tutorial-like piece that is good for learning as it introduces  MCS and and explains about the FMCS algorithm
 
-* ["Customising MCS mapping in rdkit"](https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/) - a more detailed post providing code examples about atom matching
+* ["Customising MCS mapping in rdkit"](https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/) - a more detailed post providing some code examples for atom matching
 
 <br>
 
 ###### **Strong CYP3A4 inhibitors**
 
-*To revise and shorten*
+I'm starting with the strong CYP3A4 inhibitors first.
 
 ```{python}
 # Get list of RDKit mols
@@ -487,17 +485,17 @@ Draw.MolsToGridImage(
     )
 ```
 
+You can get the number of atoms and bonds and also SMARTS string for the MCS like this below.
+
 ```{python}
-# Get number of atoms and bonds in MCS
 s3a4_mcs.numAtoms, s3a4_mcs.numBonds
 ```
 
 ```{python}
-# Generate SMARTS string for the MCS
 s3a4_mcs.smartsString
 ```
 
-One way to customise MCS was via reducing molecule threshold to relax the MCS rule as suggested by the TeachOpenCADD reference above.
+One way to customise MCS is via reducing molecule threshold to relax the MCS rule as suggested by the TeachOpenCADD reference above.
 
 ```{python}
 s3a4_mcs_80 = rdFMCS.FindMCS(mols_s3a4, threshold=0.8)
@@ -542,13 +540,13 @@ Draw.MolsToGridImage(
     )
 ```
 
-I just happend to spot a small code error above, so the MCS for moderate CYP3A4 inhibitors should be appearing for all here - aromatic (and macrolide) rings definitely involved.
+Aromatic (and macrolide) rings are definitely involved in the MCS.
 
 <br>
 
 ###### **All CYP3A4 inhibitors**
 
-Added in moderate CYP3A4 inhibitors to see if MCS changes.
+The moderate CYP3A4 inhibitors are added next to see if MCS changes when looking at all of the CYP3A4 inhibitors.
 
 ```{python}
 # Concatenate dfs for moderate & strong CYP3A4 inhibitors
@@ -574,7 +572,7 @@ Draw.MolsToGridImage(
     )
 ```
 
-It appeared the MCS for most of them involved (partial) rings (e.g. cycloalkane, aromatic and macrolide ones), so ring bonds matching will be looked at next.
+It appears the MCS for most of them involves (partial) rings (e.g. cycloalkane, aromatic and macrolide ones). This result is basically not very different from when we looked at the the CYP3A4 inhibitors separately above in their moderate and strong potencies. The next thing I want to try is to add in the ring bonds matching.
 
 ```{python}
 # matching ring bonds (if any)
@@ -589,158 +587,13 @@ Draw.MolsToGridImage(
     )
 ```
 
-Using queryMol to show the MCS structural outline for all CYP3A4 inhibitors, and each separate group of strong or moderate inhibitors.
-
-```{python}
-# for all cyp3a4 inhibitors
-all_3a4_mcs_ring.queryMol
-```
-
-```{python}
-# strong cyp3a4 inhibitors
-s3a4_mcs.queryMol
-```
-
-```{python}
-# moderate cyp3a4 inhibitors
-m3a4_mcs.queryMol
-```
+The ring bond matching also shows very similar result here where it restricts the MCS matching to ring bonds only.
 
 <br>
 
-###### **Looking at each drug class within strong CYP3A4 inhibitors**
+**Some other interesting code re. MCS**
 
-*Shorten/remove this part*
-
-There were 3 antifungals, 2 macrolides, about 5 antivirals and 4 kinase inhibitors (e.g. ceritinib, tucatinib, idelalisib, ribociclib) in the strong CYP3A4 inhibitor cohort. For people unfamiliar with these drugs, ChEMBL database do have "drug indications" recorded for each approved drug that you might be able to use to deduce what each drug was used for. The "drug indications" could be added into the SQL query at the beginning so that it'd be included into the dataframes (my old role happened to help here, so I kind of didn't need to do this).
-
-###### **Antifungals**
-
-```{python}
-# MCS for all antifungals in strong CYP3A4 inhibitors
-df_s3a4_antifungal = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("ITRACONAZOLE", "KETOCONAZOLE", "VORICONAZOLE"))]
-
-s3a4_antif = rdFMCS.FindMCS(list(df_s3a4_antifungal["rdkit_mol"]))
-s3a4_antif.queryMol
-```
-
-<br>
-
-###### **Macrolides**
-
-```{python}
-# All macrolides in strong CYP3A4 inhibitors
-df_s3a4_macro = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("CLARITHROMYCIN", "TELITHROMYCIN"))]
-```
-
-Just to clarify, telithromycin was actually a [ketolide antibacterial](https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/021144s019lbl.pdf#page=1), which was very similar to macrolide antibiotics (clarithromycin in this case).
-
-```{python}
-# Just showing how similar clarithromycin & telithromycin were 
-Draw.MolsToGridImage(
-    list(df_s3a4_macro["rdkit_mol"]), 
-    subImgSize=(400, 300), 
-    molsPerRow=2, 
-    legends = list(df_s3a4_macro["pref_name"])
-    )
-```
-
-```{python}
-# MCS for all macrolides in strong CYP3A4 inhibitors
-s3a4_macro = rdFMCS.FindMCS(list(df_s3a4_macro["rdkit_mol"]))
-s3a4_macro.queryMol
-```
-
-The typical macrolide-associated 14-membered ring [@Douthwaite2001] was shown in the MCS for both drugs.
-
-<br>
-
-###### **Antivirals**
-
-```{python}
-# All antivirals in strong CYP3A4 inhibitors
-df_s3a4_antiv = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("INDINAVIR", "NELFINAVIR", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR"))]
-
-# Images of antivirals
-Draw.MolsToGridImage(
-    list(df_s3a4_antiv["rdkit_mol"]), 
-    subImgSize=(400, 300), 
-    molsPerRow=2, 
-    legends = list(df_s3a4_antiv["pref_name"])
-    )
-```
-
-```{python}
-# MCS for all antivirals
-s3a4_antiv = rdFMCS.FindMCS(list(df_s3a4_antiv["rdkit_mol"]))
-s3a4_antiv.queryMol
-```
-
-```{python}
-# Highlighting MCS for antivirals
-Draw.MolsToGridImage(
-    list(df_s3a4_antiv["rdkit_mol"]), 
-    subImgSize=(400, 300), 
-    molsPerRow=2, 
-    legends = list(df_s3a4_antiv["pref_name"]), 
-    highlightAtomLists=[m.GetSubstructMatch(s3a4_antiv.queryMol) for m in list(df_s3a4_antiv["rdkit_mol"])]
-    )
-```
-
-I also thought about trying to align these 5 antivirals to see if this was possible.
-
-Some code references:
-
-* [Code example from RDKit docs](https://www.rdkit.org/docs/GettingStartedInPython.html#working-with-2d-molecules-generating-depictions)
-
-* RDKit docs on [rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure()](https://www.rdkit.org/docs/source/rdkit.Chem.rdDepictor.html#rdkit.Chem.rdDepictor.GenerateDepictionMatching2DStructure)
-
-If trying to align these 5 antivirals, it would fail the first time and if I turned on the "acceptFailure" mode then it would be like this below. Ideally, it should be used on a series of analogues or SAR analysis (probably not to be used this way, but I was just curious).
-
-```{python}
-# Reference mol - indinavir
-temp = df_s3a4_antiv.loc[3, "rdkit_mol"]
-
-# Set of mols to compare - rest of antivirals
-mols_antiv = df_s3a4_antiv.loc[10:, "rdkit_mol"]
-
-for mol in mols_antiv:
-    _ = AllChem.GenerateDepictionMatching2DStructure(mol,temp, acceptFailure = True)
-
-Draw.MolsToGridImage(mols_antiv, molsPerRow=2, subImgSize=(400, 300), legends=list(df_s3a4_antiv["pref_name"]))
-```
-
-<br>
-
-###### **Kinase inhibitors**
-
-```{python}
-# All kinase inhibitors 
-df_s3a4_ki = df_3a4_s_inh_p[df_3a4_s_inh_p["pref_name"].isin(("CERITINIB", "IDELALISIB", "RIBOCICLIB", "TUCATINIB"))]
-
-# MCS for all kinase inhibitors
-s3a4_ki = rdFMCS.FindMCS(list(df_s3a4_ki["rdkit_mol"]))
-s3a4_ki.queryMol
-```
-
-```{python}
-# Highlighting MCS for kinase inhibitors
-Draw.MolsToGridImage(
-    list(df_s3a4_ki["rdkit_mol"]), 
-    subImgSize=(400, 300), 
-    molsPerRow=2, 
-    legends = list(df_s3a4_ki["pref_name"]), 
-    highlightAtomLists=[m.GetSubstructMatch(s3a4_ki.queryMol) for m in list(df_s3a4_ki["rdkit_mol"])]
-    )
-```
-
-Pyrimidine rings (or part of fused pyrimidine derivatives in some cases) were shown in MCS highlighting for all 4 kinase inhibitors.
-
-<br>
-
-###### **Back to all CYP3A4 inhibitors again**
-
-Likely the last thing to try here as the idea came from a RDKit post by Paolo Tosco on, "[New MCS features in 2023.09.1](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html)" - the "Custom Python AtomCompare and BondCompare classes" section (other 3 sections were on degenerate MCSs, FinalMatchChecker and ShouldAcceptMCS - might be useful in some other cases).
+One of the code examples I'd like to try here, in order to see if it makes any difference from above, is the code snippets shared from a RDKit post by Paolo Tosco - "[New MCS features in 2023.09.1](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html)" - the "Custom Python AtomCompare and BondCompare classes" section (other 3 sections were on degenerate MCSs, FinalMatchChecker and ShouldAcceptMCS - might be useful in some other cases).
 
 Some notes from me:
 
@@ -752,15 +605,15 @@ or
 
 i.e. customise parameters using rdFMCS.MCSParameters()
 
-Since it appeared that the MCS found above for all (moderate & strong) CYP3A4 inhibitors involved rings quite a bit, I might try the second option first to see what other MCS might exist in non-ring systems.
-
 <br>
 
 **Ring systems**
 
-However, before jumping to the non-ring systems, I just wanted to try the AtomCompare & BondCompare along with RingMatchesRingOnly + CompleteRingsOnly first.
+Here, I'm trying the AtomCompare & BondCompare along with RingMatchesRingOnly and CompleteRingsOnly first.
 
 ```{python}
+#| code-fold: true
+
 ## Customise MCS parameters
 # Initiate a MCSParameter object
 params = rdFMCS.MCSParameters()
@@ -784,22 +637,24 @@ Draw.MolsToGridImage(
     )
 ```
 
-* When both BondCompareParameters were set to true, nil highlighted ring was shown (apart from ethyl chains being highlighted in every molecule)
+* When both BondCompareParameters are set to true, nil highlighted ring is shown (apart from ethyl chains being highlighted in every molecule)
 
-* When turning off CompleteRingsOnly, this allowed partial rings to be shown in highlighted MCS 
+* When turning off CompleteRingsOnly, this allows partial rings to be shown in highlighted MCS 
 
-* Similar output was generated when using ringMatchesRingOnly = True in FindMCS() earlier for all CYP3A4 inhibitors 
+* Similar output is generated when using ringMatchesRingOnly = True in FindMCS() earlier for all CYP3A4 inhibitors 
 
 <br>
 
 **Non-ring systems**
 
-Class code below were borrowed from the [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explained about why it was done as a custom "class" code and not a "function" one. I just wanted to try the code to see if the MCS would change as suggested.
+Class code below are borrowed from the [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explains about why it's done as a custom "class" code and not a "function" one.
 
 ```{python}
+#| code-fold: true
+
 # I've attempted to add comments to the code below (hopefully not too far off from what they do actually)
 
-# I had to think harder about the what the class code were doing below, especially the differences between comparing bond orders and ring atoms... I could only describe it as both a restrictive (matching non-ring bonds only) and lenient (but still comparing ring atoms) process in order to cover the non-ring parts
+# I've also had to think harder about the what the class code are doing below, especially the differences between comparing bond orders and ring atoms... I can only describe it as both a restrictive (matching non-ring bonds only) and lenient (but still comparing ring atoms) process in order to cover the non-ring parts
 
 # Compare bond orders outside ring systems using rdFMCS.MCSBondCompare
 # Using class code that will call a function object
@@ -864,19 +719,19 @@ Draw.MolsToGridImage(
     )
 ```
 
-By using the suggested class code above, the MCS has indeed become larger, where a full ring was highlighted as the MCS.
+By using the suggested class code above, the MCS has indeed become larger, where a full ring is highlighted as the MCS.
 
 <br>
 
-**Some other interesting code re. MCS**
+[Another code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen shows how to highlight molecular differences, which is opposite to highlighting only the MCS. Alternative URL link and more examples can be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences).
 
-[A code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen showed how to highlight molecular differences, which was opposite to highlighting only the MCS. Alternative URL link and more examples could be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences).
-
-Possible use cases of this code might be when dealing with a large set of analogues with changes in R-groups or during large compound screening and search (just as a few examples only, not exhaustive). The main thing I could see from the code was that it began with finding the MCS for the input molecules, then use SMARTS strings of the MCS in order to find atoms not within the MCS ([GetSubstructMatch()](https://rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.Mol.GetSubstructMatch) part) then highlight that part of the molecules.
+Possible use cases of this code may be when dealing with a large set of analogues with changes in R-groups or during large compound screening and search (just as a few examples only, not exhaustive). The main thing I can see from the code is that it begins with finding MCS for the input molecules, then use SMARTS strings of the MCS in order to find atoms not within the MCS (using [GetSubstructMatch()](https://rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.Mol.GetSubstructMatch) part) then highlight that part of the molecules.
 
 <br>
 
 ###### **Strong CYP2D6 inhibitors**
+
+**check tenses**
 
 ```{python}
 # Get list of RDKit mols
@@ -976,6 +831,6 @@ This post has become too long already so it would end here. Below were some smal
 
 <br>
 
-##### **Acknowledgement**
+##### **Acknowledgements**
 
 Thanks to every contributor, developer or authors of every software package used in this post, and also the online communities that are behind them. Also, before I forget, the thanks would also be extended to everyone who was involved in the relevant research journal papers mentioned in this post.
