@@ -2,7 +2,7 @@
 title: "Cytochrome P450 and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-8-18'
+date: '2024-8-19'
 draft: true
 categories: 
     - Metabolism
@@ -32,7 +32,7 @@ Below is a general outline of the post:
 - Further look into duplicated structures and stereochemistries
     - quinidine
     - itraconazole
-- Maximum common substructures (**need to revise and shorten**)
+- Maximum common substructures 
     - CYP3A4 inhibitors
     - CYP2D6 inhibitors
 - Some small findings and possible future work
@@ -448,7 +448,7 @@ Draw.MolsToGridImage(
 
 Maximum common substructures (MCS) is something I'm interested in trying out so below are some examples of finding MCS in these CYP inhibitors.
 
-Below are some information regarding MCS in RDKit:
+Some information regarding MCS in RDKit:
 
 * [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) is for 2 or more mols and returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
 
@@ -456,7 +456,7 @@ Below are some information regarding MCS in RDKit:
 
 Some code examples to refer to:
 
-* A [RDKit code example](https://rdkit.org/docs/GettingStartedInPython.html#findmcs) may be a good starting point to learn about MCS.
+* A [RDKit code example](https://rdkit.org/docs/GettingStartedInPython.html#findmcs) may be a good starting point to learn about MCS
 
 * [TeachOpenCADD's MCS talktorial](https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html) - a nice tutorial-like piece that is good for learning as it introduces  MCS and and explains about the FMCS algorithm
 
@@ -519,9 +519,13 @@ s3a4_mcs2 = Chem.MolFromSmarts(s3a4_mcs_80.smartsString)
 Draw.MolsToGridImage([s3a4_mcs1, s3a4_mcs2], legends=["MCS1", "MCS2 with threshold = 0.8"])
 ```
 
+Here the MCS differs between different MCS thresholds - when the threshold is not changed, it shows a partial contour of a ring structure, whereas the lowered threshold shows more of an alkyl chain structure.
+
 <br>
 
 ###### **Moderate CYP3A4 inhibitors**
+
+This is then followed by the moderate inhibitors for CYP3A4.
 
 ```{python}
 # Get list of RDKit mols
@@ -540,20 +544,20 @@ Draw.MolsToGridImage(
     )
 ```
 
-Aromatic (and macrolide) rings are definitely involved in the MCS.
+Aromatic (and macrolide) rings are highlighted in the MCS in this group.
 
 <br>
 
 ###### **All CYP3A4 inhibitors**
 
-The moderate CYP3A4 inhibitors are added next to see if MCS changes when looking at all of the CYP3A4 inhibitors.
+The moderate CYP3A4 inhibitors are then added next in order to see if MCS changes when looking at all the CYP3A4 inhibitors.
 
 ```{python}
 # Concatenate dfs for moderate & strong CYP3A4 inhibitors
 df_3a4_all = pd.concat([df_3a4_s_inh_p, df_3a4_m_inh_p])
 # index un-changed for now
 print(df_3a4_all.shape)
-df_3a4_all.head()
+df_3a4_all.head(3)
 ```
 
 ```{python}
@@ -572,7 +576,7 @@ Draw.MolsToGridImage(
     )
 ```
 
-It appears the MCS for most of them involves (partial) rings (e.g. cycloalkane, aromatic and macrolide ones). This result is basically not very different from when we looked at the the CYP3A4 inhibitors separately above in their moderate and strong potencies. The next thing I want to try is to add in the ring bonds matching.
+It appears the MCS for most of them involves (partial) rings (e.g. cycloalkane, aromatic and macrolide ones). This result is basically not very different from when we've looked at the the CYP3A4 inhibitors separately in their moderate and strong potencies. The next thing I want to try is to add in the ring bonds matching.
 
 ```{python}
 # matching ring bonds (if any)
@@ -587,23 +591,23 @@ Draw.MolsToGridImage(
     )
 ```
 
-The ring bond matching also shows very similar result here where it restricts the MCS matching to ring bonds only.
+The ring bond matching also shows a very similar result here as it only restricts the MCS matching to ring bonds only.
 
 <br>
 
 **Some other interesting code re. MCS**
 
-One of the code examples I'd like to try here, in order to see if it makes any difference from above, is the code snippets shared from a RDKit post by Paolo Tosco - "[New MCS features in 2023.09.1](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html)" - the "Custom Python AtomCompare and BondCompare classes" section (other 3 sections were on degenerate MCSs, FinalMatchChecker and ShouldAcceptMCS - might be useful in some other cases).
+One of the code examples I'd like to try next, in order to see if it makes any differences from above, is the code snippets shared by a RDKit post from Paolo Tosco - "[New MCS features in 2023.09.1](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html)" - the "Custom Python AtomCompare and BondCompare classes" section.
 
 Some notes from me:
 
-* AtomCompare & BondCompare - looking at elements/bond orders/aromaticities in ring systems
-
-or
+* AtomCompare & BondCompare - looking at elements/bond orders/aromaticities in ring systems or
 
 * custom subclasses in AtomCompare & BondCompare - looking at elements/bond orders/aromaticities in non-ring systems
 
 i.e. customise parameters using rdFMCS.MCSParameters()
+
+I'll also attempt to add some code comments below to explain how the code works (anyone's welcomed to report any issues for this part or post for updates or changes).
 
 <br>
 
@@ -637,24 +641,24 @@ Draw.MolsToGridImage(
     )
 ```
 
-* When both BondCompareParameters are set to true, nil highlighted ring is shown (apart from ethyl chains being highlighted in every molecule)
+Some MCS characteristics noted after trying this:
+
+* When both BondCompareParameters are set to true, no rings are highlighted (apart from ethyl chains being highlighted in every molecule)
 
 * When turning off CompleteRingsOnly, this allows partial rings to be shown in highlighted MCS 
 
-* Similar output is generated when using ringMatchesRingOnly = True in FindMCS() earlier for all CYP3A4 inhibitors 
+* A similar output is generated when using ringMatchesRingOnly = True in FindMCS() earlier for all CYP3A4 inhibitors 
 
 <br>
 
 **Non-ring systems**
 
-Class code below are borrowed from the [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explains about why it's done as a custom "class" code and not a "function" one.
+The class code below is also borrowed from the [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explains about why it's done as a custom "class" code and not a "function" one.
 
 ```{python}
 #| code-fold: true
 
-# I've attempted to add comments to the code below (hopefully not too far off from what they do actually)
-
-# I've also had to think harder about the what the class code are doing below, especially the differences between comparing bond orders and ring atoms... I can only describe it as both a restrictive (matching non-ring bonds only) and lenient (but still comparing ring atoms) process in order to cover the non-ring parts
+# I've had to think harder about the what the class code are doing below, especially the differences between comparing bond orders and ring atoms... I can only describe it as both a restrictive (matching non-ring bonds only) and lenient (but still comparing ring atoms) process in order to cover the non-ring parts (?)
 
 # Compare bond orders outside ring systems using rdFMCS.MCSBondCompare
 # Using class code that will call a function object
@@ -721,66 +725,18 @@ Draw.MolsToGridImage(
 
 By using the suggested class code above, the MCS has indeed become larger, where a full ring is highlighted as the MCS.
 
-<br>
+[A second code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen is to highlight molecular differences, which is different from highlighting only the MCSes. Alternative URL link and more examples can be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences).
 
-[Another code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen shows how to highlight molecular differences, which is opposite to highlighting only the MCS. Alternative URL link and more examples can be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences).
-
-Possible use cases of this code may be when dealing with a large set of analogues with changes in R-groups or during large compound screening and search (just as a few examples only, not exhaustive). The main thing I can see from the code is that it begins with finding MCS for the input molecules, then use SMARTS strings of the MCS in order to find atoms not within the MCS (using [GetSubstructMatch()](https://rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.Mol.GetSubstructMatch) part) then highlight that part of the molecules.
-
-<br>
-
-###### **Strong CYP2D6 inhibitors**
-
-**check tenses**
-
-```{python}
-# Get list of RDKit mols
-mols_s2d6 = list(df_2d6_s_inh_p["rdkit_mol"])
-
-# Find MCS in mols
-s2d6_mcs = rdFMCS.FindMCS(mols_s2d6)
-
-# Get images of highlighted MCS for strong CYP3A4 inhibitors
-Draw.MolsToGridImage(
-    mols_s2d6, 
-    subImgSize=(400, 300), 
-    molsPerRow=2, 
-    legends = list(df_2d6_s_inh_p["pref_name"]), 
-    highlightAtomLists=[m.GetSubstructMatch(s2d6_mcs.queryMol) for m in mols_s2d6]
-    )
-```
-
-Ring with longer alkyl chain appeared to be in the MCS (as a very general first look).
-
-<br>
-
-###### **Moderate CYP2D6 inhibitors**
-
-```{python}
-# Get list of RDKit mols
-mols_m2d6 = list(df_2d6_m_inh_p["rdkit_mol"])
-
-# Find MCS in mols
-m2d6_mcs = rdFMCS.FindMCS(mols_m2d6)
-
-# Get images of highlighted MCS for moderate CYP3A4 inhibitors
-Draw.MolsToGridImage(
-    mols_m2d6, 
-    subImgSize=(400, 300), 
-    molsPerRow=2, 
-    legends = list(df_2d6_m_inh_p["pref_name"]), 
-    highlightAtomLists=[m.GetSubstructMatch(m2d6_mcs.queryMol) for m in mols_m2d6]
-    )
-```
-
-Both aromatic and non-aromatic rings (fused ones also included) were shown here as MCS for moderate CYP2D6 inhibitors.
+Possible use cases of this code may be when dealing with a large set of analogues with changes in R-groups or during large compound screening and search (just as a few examples only). The main thing I can see from the code is that it begins with finding MCS for the input molecules, then use SMARTS strings of the MCS in order to find atoms not within the MCS (using [GetSubstructMatch()](https://rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.Mol.GetSubstructMatch) part) then highlight that part of the molecules.
 
 <br>
 
 ###### **All CYP2D6 inhibitors**
 
+Because of how the MCSes have turned out for CYP3A4 inhibitors above, I think I should just look at CYP2D6 inhibitors as a whole here. First thing is to combine the dataframes together, between the moderate and strong inhibitor groups.
+
 ```{python}
-# Concatenate dfs for moderate & strong CYP2D6 inhibitors
+# Concatenate dfs 
 df_2d6_all = pd.concat([df_2d6_s_inh_p, df_2d6_m_inh_p])
 # index un-changed for now
 print(df_2d6_all.shape)
@@ -803,34 +759,26 @@ Draw.MolsToGridImage(
     )
 ```
 
-If combining both moderate and strong CYP2D6 inhibitors, without using further MCS functionalities, only ring structures were shown in the MCS highlighting.
-
-One characteristic about the CYP2D6 inhibitors here was that some of them were drugs acting on or relating to central nervous system (about 9 out of 14 drugs) - e.g. bupropion, fluoxetine, paroxetine, clobazam, doxepin, duloxetine, locaserin (an approved drug but withdrawn due to adverse effect; acting on serotonin receptor), moclobemide and rolapitant (antiemetic that crosses blood-brain barrier).
+Again, ring structures are the MCS in the highlighted parts.
 
 <br>
 
 ##### **Some findings and future work**
 
-This post has become too long already so it would end here. Below were some small findings and thoughts.
+Below are some of my small findings and thoughts.
 
-* Partial rings within heterocycles were shown mainly in MCS of CYP3A4 inhibitors (clinically-documented moderate and strong CYP3A4 inhibitors only) if we only used the default rdFMCS.AtomCompare and rdFMCS.BondCompare with the ring matching parameters (e.g. RingMatchesRingOnly)
+* Many pharmaceuticals have different types of rings found in their chemical structures [@Taylor2014], so it is unsurprising that the MCSes found from these compounds are mainly rings
 
-* Full rings were shown in the MCS if we extended the bond and atom comparisons to cover the non-ring systems (i.e. a more flexible comparison than a restricted one, but still making the code to match rings only) 
+* It may be more interesting to compare the MCSes between CYP3A4 and CYP2D6 substrates
 
-* Many pharmaceuticals had different types of rings found in their chemical structures [@Taylor2014], so it was unsurprising that inhibiting CYP3A4 was commonly found in approved drugs
+* Looking at CYP structures in relation to these inhibitors may also reveal more insights about possible binding sites or mechanisms of actions for these compounds. For example, some of CYP2D6 inhibitors are drugs acting on central nervous system (about 9 out of 14 drugs) - e.g. bupropion, fluoxetine, paroxetine, clobazam, doxepin, duloxetine, locaserin (an approved drug but withdrawn due to adverse effect; acting on serotonin receptor), moclobemide and rolapitant (antiemetic that crosses blood-brain barrier). For the CYP3A4 inhibitors, they are also in several different classes of drugs e.g. antivirals, antifungals, kinase inhibitors and so on.
 
-* It might be interesting to compare the MCS found in CYP3A4 inhibitors with the MCS for CYP3A4 substrates
+* Future posts may involve looking at CYP substrates (other CYP inhibitors may also be looked at but most likely may lead to similar result as this one... however it may just be nice to confirm it)
 
-* It appeared that the difference between the MCS of the moderate and strong CYP2D6 inhibitors was the alkyl chain attached to ring structures (although partial ring highlighted only) in strong CYP2D6 inhibitors, which was not found in the moderate CYP2D6 inhibitors
-
-* As to the differences between CYP3A4 and 2D6 inhibitors, perhaps it was very subtle, as both groups seemed to show ring structures... Perhaps looking at CYP2D6 substrates will help (I was only scratching the surface here maybe)
-
-* It might also worth to spend more time on exploring the CYP structures in relation to these inhibitors (more of a structure-based drug design realm), which might reveal more insights than what were found here
-
-* Future posts may involve looking at other CYPs, particularly on other inhibitors and substrates. Inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects
+* CYP inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects, so they may be looked at further down the line
 
 <br>
 
 ##### **Acknowledgements**
 
-Thanks to every contributor, developer or authors of every software package used in this post, and also the online communities that are behind them. Also, before I forget, the thanks would also be extended to everyone who was involved in the relevant research journal papers mentioned in this post.
+Thanks to every contributor, developer or authors of every software package used in this post, and also the online communities that are behind them. Also, before I forget, the thanks would also be extended to everyone who was involved in the relevant research journal papers mentioned in this post. Lastly, special thanks to Noel O'Boyle for being very patient with reading my awfully-long old draft earlier and pointed out some useful things to change (I kind of got lost when writing the draft... due to it being a "free-style post", I should avoid doing this again).
