@@ -2,7 +2,7 @@
 title: "Cytochrome P450 and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-8-19'
+date: '2024-8-20'
 draft: true
 categories: 
     - Metabolism
@@ -19,7 +19,9 @@ bibliography: references.bib
 
 ##### **Outline**
 
-Main goal for this post is to have a preliminary look into two of the most common groups of cytochrome P450 (CYPs) inhibitors with an initial aim to look for any maximum common substructures if present or applicable.
+Main goal for this post is to have a preliminary look into two of the most common groups of cytochrome P450 (CYP) inhibitors with an initial aim to look for any maximum common substructures in these compounds if present or applicable.
+
+**TL;DR** - many pharmaceuticals have different types of rings found in their chemical structures [@Taylor2014], so it is unsurprising that the MCSes found are mainly rings. To further explore the underlying mechanisms of actions (e.g. putative or active binding sites) of these CYP inhibitors, the structures of CYP should be examined at the same time ideally.
 
 Below is a general outline of the post:
 
@@ -28,13 +30,14 @@ Below is a general outline of the post:
     - more on CYPs and ADMET (just a thought on another drug metabolism data source)
 - Data extraction using chembl_downloader
 - Data import and preprocessing
-- Quick check on structural validites
+- Quick check on structural validities
 - Further look into duplicated structures and stereochemistries
     - quinidine
     - itraconazole
-- Maximum common substructures 
+- Maximum common substructures (MCS)
     - CYP3A4 inhibitors
     - CYP2D6 inhibitors
+    - Some other interesting code re. MCS
 - Some small findings and possible future work
 - Acknowledgements
 
@@ -151,7 +154,7 @@ I'm using SQL via chembl_downloader to download approved drugs with their ChEMBL
 
 Note: Three other categories of medicines are not going to be looked at for now, which are the weak inhibitors, ones with *in vitro* evidence only and ones that are still pending reviews.
 
-A bit about retrieving data here, the following may not be the best way to get the data, but I've somehow incorporated chembl_downloader into my own small piece of function code (see Python script named as "cyp_drugs.py" in the [repo](https://github.com/jhylin/CYP450_and_drug_mols)) to retrieve SMILES of approved drugs (other public databases may also work very well equally, but I'm used to using ChEMBL due to its nice way of arranging information). 
+A bit about retrieving data here, the following may not be the best way to get the data, but I've somehow incorporated chembl_downloader into my own small piece of function code (see Python script named as "cyp_drugs.py" in the [repo](https://github.com/jhylin/CYP450_and_drug_mols)) to retrieve SMILES of approved drugs (other public databases may also work very well equally, but I'm used to using ChEMBL now as it's easy to read and navigate). 
 
 Another possible way is to use get_target_sql() within chembl_downloader, e.g. using a specific CYP enzyme as the protein target to retrieve data, but it appears that there are no clear data marked to indicate the potency of CYP inhibition or induction (i.e. weak, moderate or strong) in the ChEMBL database (an [example link for CYP2D6 in ChEMBL](https://www.ebi.ac.uk/chembl/web_components/explore/activities/STATE_ID:pxs_ydUxNelxmAa9ckYEPw%3D%3D)). The Flockhart table has clearly annotated each approved drug with journal paper citations so I decide to stick with the previous method.
 
@@ -446,7 +449,7 @@ Draw.MolsToGridImage(
 
 ##### **Maximum common substructures**
 
-Maximum common substructures (MCS) is something I'm interested in trying out so below are some examples of finding MCS in these CYP inhibitors.
+MCS is something I'm interested in trying out so below are some examples of finding MCS in these CYP inhibitors.
 
 Some information regarding MCS in RDKit:
 
@@ -458,7 +461,7 @@ Some code examples to refer to:
 
 * A [RDKit code example](https://rdkit.org/docs/GettingStartedInPython.html#findmcs) may be a good starting point to learn about MCS
 
-* [TeachOpenCADD's MCS talktorial](https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html) - a nice tutorial-like piece that is good for learning as it introduces  MCS and and explains about the FMCS algorithm
+* [TeachOpenCADD's MCS talktorial](https://projects.volkamerlab.org/teachopencadd/talktorials/T006_compound_maximum_common_substructures.html) - a nice tutorial-like piece that introduces MCS and explains about the FMCS algorithm
 
 * ["Customising MCS mapping in rdkit"](https://www.blopig.com/blog/2023/06/customising-mcs-mapping-in-rdkit/) - a more detailed post providing some code examples for atom matching
 
@@ -544,13 +547,13 @@ Draw.MolsToGridImage(
     )
 ```
 
-Aromatic (and macrolide) rings are highlighted in the MCS in this group.
+Aromatic (and macrolide) rings are highlighted in the MCS for this group.
 
 <br>
 
 ###### **All CYP3A4 inhibitors**
 
-The moderate CYP3A4 inhibitors are then added next in order to see if MCS changes when looking at all the CYP3A4 inhibitors.
+The moderate CYP3A4 inhibitors are then added next in order to see if MCS changes when looking at all of the CYP3A4 inhibitors.
 
 ```{python}
 # Concatenate dfs for moderate & strong CYP3A4 inhibitors
@@ -607,7 +610,7 @@ Some notes from me:
 
 i.e. customise parameters using rdFMCS.MCSParameters()
 
-I'll also attempt to add some code comments below to explain how the code works (anyone's welcomed to report any issues for this part or post for updates or changes).
+I'll also attempt to add some code comments below to explain how the code works (anyone's welcomed to report any issues or changes for this part).
 
 <br>
 
@@ -653,12 +656,15 @@ Some MCS characteristics noted after trying this:
 
 **Non-ring systems**
 
-The class code below is also borrowed from the [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explains about why it's done as a custom "class" code and not a "function" one.
+The class code below is also borrowed from the [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-10-27-mcswhatsnew.html), which explains why it's done as a custom "class" code and not a "function" one.
 
 ```{python}
 #| code-fold: true
 
-# I've had to think harder about the what the class code are doing below, especially the differences between comparing bond orders and ring atoms... I can only describe it as both a restrictive (matching non-ring bonds only) and lenient (but still comparing ring atoms) process in order to cover the non-ring parts (?)
+# I've had to think harder about the what the class code are doing below, 
+# especially the differences between comparing bond orders and ring atoms... 
+# I can only describe it as both a restrictive (matching non-ring bonds only) 
+# and lenient (but still comparing ring atoms) process in order to cover the non-ring parts (?)
 
 # Compare bond orders outside ring systems using rdFMCS.MCSBondCompare
 # Using class code that will call a function object
@@ -733,7 +739,7 @@ Possible use cases of this code may be when dealing with a large set of analogue
 
 ###### **All CYP2D6 inhibitors**
 
-Because of how the MCSes have turned out for CYP3A4 inhibitors above, I think I should just look at CYP2D6 inhibitors as a whole here. First thing is to combine the dataframes together, between the moderate and strong inhibitor groups.
+Because of how the MCSes have turned out for CYP3A4 inhibitors above, I think I should just look at CYP2D6 inhibitors as a whole here. First thing is to combine the dataframes between the moderate and strong inhibitor groups.
 
 ```{python}
 # Concatenate dfs 
@@ -767,11 +773,11 @@ Again, ring structures are the MCS in the highlighted parts.
 
 Below are some of my small findings and thoughts.
 
-* Many pharmaceuticals have different types of rings found in their chemical structures [@Taylor2014], so it is unsurprising that the MCSes found from these compounds are mainly rings
+* As mentioned at the very top in the outline section, rings (heterocycles, aromatic or fused ones) are everywhere in the MCSes for CYP3A4 and CYP2D6 inhibitors
 
-* It may be more interesting to compare the MCSes between CYP3A4 and CYP2D6 substrates
+* It may be a bit more interesting to compare the MCSes between CYP3A4 and CYP2D6 substrates (and even with the substrates for other CYPs)
 
-* Looking at CYP structures in relation to these inhibitors may also reveal more insights about possible binding sites or mechanisms of actions for these compounds. For example, some of CYP2D6 inhibitors are drugs acting on central nervous system (about 9 out of 14 drugs) - e.g. bupropion, fluoxetine, paroxetine, clobazam, doxepin, duloxetine, locaserin (an approved drug but withdrawn due to adverse effect; acting on serotonin receptor), moclobemide and rolapitant (antiemetic that crosses blood-brain barrier). For the CYP3A4 inhibitors, they are also in several different classes of drugs e.g. antivirals, antifungals, kinase inhibitors and so on.
+* Looking at CYP structures in relation to these inhibitors may be more meaningful and also may reveal more insights about possible binding sites or mechanisms of actions for these compounds. For example, some of CYP2D6 inhibitors are drugs acting on central nervous system (about 9 out of 14 drugs) - e.g. bupropion, fluoxetine, paroxetine, clobazam, doxepin, duloxetine, locaserin, moclobemide and rolapitant. For the CYP3A4 inhibitors, they are also in several different classes of drugs e.g. antivirals, antifungals, antibacterials, kinase inhibitors and so on.
 
 * Future posts may involve looking at CYP substrates (other CYP inhibitors may also be looked at but most likely may lead to similar result as this one... however it may just be nice to confirm it)
 
