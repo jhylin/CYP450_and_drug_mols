@@ -2,7 +2,7 @@
 title: "Cytochrome P450 and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-8-21'
+date: '2024-8-22'
 draft: true
 categories: 
     - Metabolism
@@ -91,7 +91,7 @@ From ChEMBL 20, only 6 filters are present, as shown by this [ChEMBL blogpost](h
 
 From ChEMBL 20 to 23, there are 8 filters in total (agreed with rd_filters' README.md that there aren't many documentations about this in ChEMBL, as I've tried also), the sources of the two additional ones are as follow:
 
-* Inpharmatica - unable to find direct source initially but later this is later confirmed as private communications between ChEMBL and Inpharmatica Ltd. in the earlier days - an older ChEMBL presentation on ChEMBL 09 mentions about this, and this is also further elaborated by this paper [@chembl2017]
+* Inpharmatica - unable to find direct source initially but this is later confirmed as private communications between ChEMBL and Inpharmatica Ltd. in the earlier days - an older ChEMBL presentation on ChEMBL 09 mentions about this, and this is also further elaborated by this paper [@chembl2017]
 
 * [SureChEMBL](https://chembl.gitbook.io/surechembl/chemical-search/smarts-search) (old link provided by the paper [@chembl2017] also no longer exists)
 
@@ -361,7 +361,7 @@ rdCIPLabeler.AssignCIPLabels(itracon_5)
 itracon_5
 ```
 
-Clearly, even if the SMILES of these two itraconzoles are not converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other one is without due to the presence of "@" in the SMILES string for the one at index row 4. The output images shows exactly that - one with chiral centres, where the other one doesn't have any.
+Clearly, even if the SMILES of these two itraconzoles are not converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other one is without due to the presence of "@" in the SMILES string for the one at index row 4. The output images show exactly that - one with chiral centres, where the other one doesn't have any.
 
 PubChem calculations have however generated different result for itraconazole. It seems it only has one defined atom stereocentre count and two undefined stereocentre counts ([PubChem reference](https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true)).
 
@@ -758,7 +758,7 @@ Draw.MolsToGridImage(
     )
 ```
 
-Again, only ring structures are highlighted as the MCS.
+Again, only a phenyl ring is highlighted as the MCS so this is not informative at all.
 
 <br>
 
