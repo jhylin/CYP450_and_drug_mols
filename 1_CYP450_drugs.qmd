@@ -2,7 +2,7 @@
 title: "Cytochrome P450 and small drug molecules"
 subtitle: "CYP3A4 and 2D6 inhibitors"
 author: Jennifer HY Lin
-date: '2024-8-20'
+date: '2024-8-21'
 draft: true
 categories: 
     - Metabolism
@@ -19,22 +19,22 @@ bibliography: references.bib
 
 ##### **Outline**
 
-Main goal for this post is to have a preliminary look into two of the most common groups of cytochrome P450 (CYP) inhibitors with an initial aim to look for any maximum common substructures in these compounds if present or applicable.
+The main goal for this post is to have a preliminary look into two of the most common groups of cytochrome P450 (CYP) inhibitors with an initial aim to look for any maximum common substructures (MCS) in these compounds if present or applicable.
 
-**TL;DR** - many pharmaceuticals have different types of rings found in their chemical structures [@Taylor2014], so it is unsurprising that the MCSes found are mainly rings. To further explore the underlying mechanisms of actions (e.g. putative or active binding sites) of these CYP inhibitors, the structures of CYP should be examined at the same time ideally.
+**TL;DR** - Many pharmaceuticals have different types of rings found in their chemical structures [@Taylor2014], so it is unsurprising that the MCSes found here are mainly rings. To further explore the underlying mechanisms of actions (e.g. putative or active binding sites) of these CYP inhibitors, the structures of CYPs should be examined at the same time ideally.
 
 Below is a general outline of the post:
 
 - Small introduction on drug toxicology and metabolism regarding CYPs
-    - more on drug structural alerts in ChEMBL (citing data sources)
-    - more on CYPs and ADMET (just a thought on another drug metabolism data source)
+    - citing data sources for drug structural alerts in ChEMBL
+    - a thought on another drug metabolism data source
 - Data extraction using chembl_downloader
 - Data import and preprocessing
 - Quick check on structural validities
 - Further look into duplicated structures and stereochemistries
     - quinidine
     - itraconazole
-- Maximum common substructures (MCS)
+- Maximum common substructures
     - CYP3A4 inhibitors
     - CYP2D6 inhibitors
     - Some other interesting code re. MCS
@@ -55,21 +55,17 @@ In a very rough sense, three main areas have been looked at (not exhaustive) wit
 
     Many have looked into structural alerts (an example repo: [rd_filters](https://github.com/PatWalters/rd_filters)). ChEMBL database has already had a cheminformatic utils web service developed that provides structural alert computations for compounds. There are most likely much more efforts than these ones.
 
-2. Toxicophores in relation to **human ether-a-go-go-related gene (hERG) potassium channel** (this may be similar to the first one actually)
+2. Toxicophores in relation to **human ether-a-go-go-related gene (hERG) potassium channel** (related to structural alerts as well)
 
     hERG potassium channel is also another frequently-looked-at aspect for drug toxicology due to its known effect leading to cardiac QT prolongations or more commonly known as arrhythmias [@Curran1995].
 
-3. **Cytochrome P450 enzymes** (CYP450, CYP isoenzymes, CYP or CYPs), the well-known ones were CYP3A4, 2D6, 1A2, 2C9 and 2C19
+3. **CYP enzymes** with the well-known ones as CYP3A4, 2D6, 1A2, 2C9 and 2C19
 
-    CYP450 enzymes play a key role in the metabolism and toxicology parts of the ADMET process of drugs. 
-
-    When a drug behaves like a cytochrome inhibitor, it inhibits the activity of a particular cytochrome enzyme e.g. CYP3A4 leading to a reduction of clearance of a particular therapeutic drug e.g. a CYP3A4 substrate such as apixaban, thus increasing its plasma concentration *in vivo* causing a higher chance of adverse effect (which in the context of apixaban, this means the poor person taking the apixaban may get excessive bleeding...).
-
-    My very inital naive thought is that if we could at least cover some of the drug toxicology part during drug design and discovery process, this may be able to save some resources along the way (obviously it won't be this simple...).
-    
-    Nevertheless, it may still be useful and interesting to look into the relationship between CYP450 and small drug molecules to see if there are anything worth further explorations. This post will start with the two largest groups of CYP inhibitors, so focussing on CYP3A4 and 2D6 first.
+    CYP450 enzymes play a key role in the metabolism and toxicology parts of the ADMET process of drugs. When a drug behaves like a cytochrome inhibitor, it inhibits the activity of a particular cytochrome enzyme e.g. CYP3A4 leading to a reduction of clearance of a particular therapeutic drug e.g. a CYP3A4 substrate such as apixaban, thus increasing its plasma concentration *in vivo* causing a higher chance of adverse effect (which in the context of apixaban, this means the poor person taking the apixaban may get excessive bleeding...).
 
 Other useful categories involve drug-induced skin sensitisations and liver injuries and more.
+
+My very inital naive thought is that if we can at least cover some of the drug toxicology part during drug design and discovery process, this may be able to save some resources along the way (obviously it won't be this simple...). The main thing here is that it may still be useful and interesting to look into the relationship between CYP450 and small drug molecules - to see if there are anything worth further explorations. This post will start with the two largest groups of CYP inhibitors, so focussing on CYP3A4 and 2D6 first.
 
 While my focus is only on a very small cohort of small molecules relating to only two CYPs, it is also worth noting that there are actually more CYPs present as well, for example, CYP1A1, 2A6, 2B6, 2C8, 2E1, 2J2, 3A5 (note: amlodipine is a moderate CYP3A5 inhibitor and will be looked at below), 3A7 and 4F2 [@Guengerich2021]. The cited paper here also provides quite a comprehensive background on the history of CYP450 and their relevance to toxicities in drugs, so I won't repeat them here.
 
@@ -79,7 +75,7 @@ While my focus is only on a very small cohort of small molecules relating to onl
 
 I am only really curious about the data sources used to build these ChEMBL structural alerts, so below are some of my notes on these sources.
 
-From ChEMBL 20, only 6 filters are present, as shown by this [ChEMBL blogpost](http://chembl.blogspot.com/2015/02/chembl-20-released.html) - it may appear that this blog post cites all 8 filters but in fact it only has 6.
+From ChEMBL 20, only 6 filters are present, as shown by this [ChEMBL blogpost](http://chembl.blogspot.com/2015/02/chembl-20-released.html) - it may appear that this blog post cites all 8 filters but in fact it only has 6. I've attempted to find out the sources of these ChEMBL structural alert sets, here they are:
 
 * [Pfizer LINT filters](https://www.eurekaselect.com/article/24760)
 
@@ -93,13 +89,13 @@ From ChEMBL 20, only 6 filters are present, as shown by this [ChEMBL blogpost](h
 
 * [PAINS filters](https://pubs.acs.org/doi/10.1021/jm901137j)
 
-From ChEMBL 20 to 23, there are 8 filters in total (agreed with rd_filters' README.md that there aren't many documentations about this in ChEMBL, as I've tried to search for this on ChEMBL but nothing in details are found), the sources of the two additional ones are as follow:
+From ChEMBL 20 to 23, there are 8 filters in total (agreed with rd_filters' README.md that there aren't many documentations about this in ChEMBL, as I've tried also), the sources of the two additional ones are as follow:
 
-* Inpharmatica - unable to find direct source initially then I've found out later that this has been obtained through private communications between ChEMBL and Inpharmatica Ltd. in the earlier days. An older ChEMBL presentation on ChEMBL 09 mentions about this, and this is also further elaborated by this paper [@chembl2017]
+* Inpharmatica - unable to find direct source initially but later this is later confirmed as private communications between ChEMBL and Inpharmatica Ltd. in the earlier days - an older ChEMBL presentation on ChEMBL 09 mentions about this, and this is also further elaborated by this paper [@chembl2017]
 
 * [SureChEMBL](https://chembl.gitbook.io/surechembl/chemical-search/smarts-search) (old link provided by the paper [@chembl2017] also no longer exists)
 
-RDKit (section on ["Filtering unwanted substructures"](https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures)) also has another NIH filter based on two other references [@Jadhav2010] and [@Doveston2015]. At one point I'm so confused with this NIH filter here and the NIH MLSMR one above... they are actually different as different papers are cited actually. 
+RDKit (section on ["Filtering unwanted substructures"](https://www.rdkit.org/docs/GettingStartedInPython.html#filtering-unwanted-substructures)) also has another NIH filter based on two other references [@Jadhav2010] and [@Doveston2015]. At one point I'm so confused with this NIH filter here and the NIH MLSMR one above... they are actually different as different papers are cited. 
 
 RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](https://www.rdkit.org/docs/source/rdkit.Chem.rdfiltercatalog.html#rdkit.Chem.rdfiltercatalog.FilterCatalogParams.FilterCatalogs) class currently. Brenk filter seems to be the same as the CHEMBL_Dundee one since both of them have quoted the same journal paper as reference. It's also got a ZINC one I think. Before I get very carried away, I'll stop searching for every structural alerts papers here as there are many in the literatures.
 
@@ -109,7 +105,7 @@ RDKit also uses the above 8 filters mentioned in ChEMBL in its [FilterCatalogs](
 
 A bit of a sidetrack for this part (feel free to skip) as I come across a new paper online recently about using deep learning model for ADMET prediction which uses data from Therapeutics data commons (TDC). So while working on this relevant topic of CYP and ADMET (only the metabolism and toxicology parts), I just want to dig a bit deeper to see what sort of data are used by TDC.
 
-The [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism), specifically the metabolism one on all five CYP isoenzymes (CYP2C19, 2D6, 3A4, 1A2 and 2C9), are all derived from a 2009 paper by [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). A closer look at this paper only seems to only mention:
+The [TDC ADME dataset](https://tdcommons.ai/single_pred_tasks/adme/#metabolism), specifically the metabolism one on all five CYP isoenzymes (CYP2C19, 2D6, 3A4, 1A2 and 2C9), are all derived from a 2009 paper by [Veith et al.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2783980/). A closer look at this paper only seems to mention:
 
 > ...we tested 17,143 samples at between seven and fifteen concentrations for all five CYP isozymes. The samples consisted of 8,019 compounds from the MLSMR including compounds chosen for diversity and rule-of-five compliance, 16 synthetic tractability, and availability; 6,144 compounds from a set of biofocused libraries which included 1,114 FDA-approved drugs; and 2,980 compounds from combinatorial libraries containing privileged structures targeted at GPCRs and kinases, and libraries of purified natural products or related structures...
 
@@ -117,7 +113,7 @@ If I go to its original journal paper site (the link provided was a NCBI one), t
 
 > ...It has been suggested that CYP 3A4 is the most prominent P450 isozyme in drug metabolism and hepatic distribution (Fig. 2b),^25^^,^ ^26^ but the drugs in our collection do not appear to have been optimized away from this activity. There has also been speculation that CYP 2D6 isozyme plays a prominent role in drug metabolism,^27^ but no difference in activity was observed between diversity compounds and approved drugs for this isozyme...
 
-Well, it may be due to the imbalanced set of compounds used e.g. number of FDA-approved drug (smaller) vs. number of other compounds from other libraries (larger).
+I wonder if this may be due to the imbalanced set of compounds used e.g. number of FDA-approved drug (smaller) vs. number of other compounds from other libraries (larger)...
 
 I've also visited FDA's website to look at how the CYP stories are compiled ([FDA link](https://www.fda.gov/drugs/drug-interactions-labeling/drug-development-and-drug-interactions-table-substrates-inhibitors-and-inducers)). The *in vitro* inhibitors and clinical index inhibitors are not completely the same across all the CYPs. There are some overlappings in CYP3A4/5 and 2D6 for sure but definitely not exactly the same across all the documented CYPs in this FDA webpage. 
 
@@ -172,7 +168,7 @@ df_3a4_strong_inh = chembl_drugs(
     "CERITINIB", "CLARITHROMYCIN", "DELAVIRIDINE", "IDELALISIB", "INDINAVIR", "ITRACONAZOLE", "ITRACONZOLE", "KETOCONAZOLE", "MIBEFRADIL", "NEFAZODONE", "NELFINAVIR", "RIBOCICLIB", "RITONAVIR", "SAQUINAVIR", "TELAPREVIR", "TELITHROMYCIN", "TUCATINIB", "VORICONAZOLE",
     #file_name="strong_3a4_inh"
     )
-df_3a4_strong_inh
+df_3a4_strong_inh.head()
 ```
 
 ```{python}
@@ -182,7 +178,7 @@ df_3a4_strong_inh
 df_3a4_mod_inh = chembl_drugs(
     "AMLODIPINE", "APREPITANT", "CIPROFLOXACIN", "CRIZOTINIB", "DILTIAZEM", "ERYTHROMYCIN", "FLUCONAZOLE", "IMATINIB", "LETERMOVIR", "NETUPITANT", "VERAPAMIL", #file_name="mod_3a4_inh"
     )
-df_3a4_mod_inh
+df_3a4_mod_inh.head()
 ```
 
 ```{python}
@@ -200,22 +196,23 @@ df_2d6_mod_inh = chembl_drugs(
     "ABIRATERONE", "CINACALCET", "CLOBAZAM", "DOXEPIN", "DULOXETINE", "HALOFANTRINE", "LORCASERIN", "MOCLOBEMIDE", "ROLAPITANT", "TERBINAFINE", 
     #file_name="mod_2d6_inh"
     )
-df_2d6_mod_inh
+df_2d6_mod_inh.head()
 ```
 
-Initially, four categories of approved drugs are retrieved - both strong and moderate CYP3A4 inhibitors, and also the strong and moderate CYP2D6 inhibitors. CYP3A4 inhibitors are the largest cohort of all the cytochrome inhibitors known so far (based on clinical documentations). 
+Initially, four categories of approved drugs are retrieved - the strong and moderate CYP3A4 inhibitors, and also the strong and moderate CYP2D6 inhibitors. CYP3A4 inhibitors are the largest cohort of all the cytochrome inhibitors known so far (based on clinical documentations). 
 
 <br>
 
 ##### **Import and preprocess data**
 
 ```{python}
-## When using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 (all latest major versions, 
+## When using pandas 2.2.2, numpy 2.0.0 and rdkit 2024.3.1 
+# (all latest major versions at the time of writing, 
 # note: rdkit has a latest minor release as 2024.03.4, which includes a patch for numpy 2.0)
-# Seems to work as a new df is generated but with error messages shown though
+# Seems to work as a new df is generated but with error messages shown
 
 ## Eventually using downgraded versions of pandas and numpy instead 
-# pandas 2.1.4, numpy 1.26.4 & rdkit 2024.3.1 work with no error messages generated as output
+# pandas 2.1.4, numpy 1.26.4 & rdkit 2024.3.1 work with no error messages generated
 
 # preprocess canonical smiles 
 from mol_prep import preprocess
@@ -230,21 +227,21 @@ df_3a4_s_inh_p.head(3)
 # cyp3a4 moderate inhibitors
 df_3a4_m_inh = df_3a4_mod_inh.copy()
 df_3a4_m_inh_p = df_3a4_m_inh.apply(preprocess, axis=1)
-df_3a4_m_inh_p.head()
+df_3a4_m_inh_p.head(3)
 ```
 
 ```{python}
 # cyp2d6 strong inhibitors
 df_2d6_s_inh = df_2d6_strong_inh.copy()
 df_2d6_s_inh_p = df_2d6_s_inh.apply(preprocess, axis=1)
-df_2d6_s_inh_p
+df_2d6_s_inh_p.head(3)
 ```
 
 ```{python}
 #cyp2d6 moderate inhibitors
 df_2d6_m_inh = df_2d6_mod_inh.copy()
 df_2d6_m_inh_p = df_2d6_m_inh.apply(preprocess, axis=1)
-df_2d6_m_inh_p.head()
+df_2d6_m_inh_p.head(3)
 ```
 
 <br>
@@ -277,7 +274,7 @@ Draw.MolsToGridImage(
 
 ###### **Duplicated structures and stereochemistries**
 
-This is a small detour while checking structural validities due to the presence of two duplicated drug molecules, and since these two molecules consist of some stereocentres, I'm going to have a look at their stereochemistries. 
+This is a small detour while checking structural validities due to the presence of two duplicated molecules, and since these two molecules consist of stereocentres, I'm just going to have a look at their stereochemistries. 
 
 <br>
 
@@ -343,19 +340,6 @@ df_2d6_s_inh_p
 Two itraconazoles are also found with different stereochemistries.
 
 ```{python}
-#df_3a4_s_inh_p
-```
-
-```{python}
-# strong cyp3a4 inhibitors
-Draw.MolsToGridImage(
-    df_3a4_s_inh_p["rdkit_mol"], 
-    molsPerRow=3, 
-    subImgSize=(400, 300), 
-    legends=list(df_3a4_s_inh_p["pref_name"]))
-```
-
-```{python}
 # Get SMILES of itraconazole at index row 4
 df_3a4_s_inh_p.loc[4, "canonical_smiles"]
 ```
@@ -377,15 +361,15 @@ rdCIPLabeler.AssignCIPLabels(itracon_5)
 itracon_5
 ```
 
-Clearly, even if the SMILES of these two itraconzoles are not converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other one is without due to the presence of "@" in the SMILES string for the one at index row 4. The output images shows exactly that - one with chiral centres, where the other does not have any.
+Clearly, even if the SMILES of these two itraconzoles are not converted into RDKit molecules, we can probably tell one of them has stereochemistries and the other one is without due to the presence of "@" in the SMILES string for the one at index row 4. The output images shows exactly that - one with chiral centres, where the other one doesn't have any.
 
 PubChem calculations have however generated different result for itraconazole. It seems it only has one defined atom stereocentre count and two undefined stereocentre counts ([PubChem reference](https://pubchem.ncbi.nlm.nih.gov/compound/44428219#section=Computed-Properties&fullscreen=true)).
 
 I've also noted that the two itraconzoles obtained from ChEMBL have different ChEMBL ID numbers (ChEMBL IDs: CHEMBL22587 and CHEMBL64391) to the one calculated in PubChem (ChEMBL ID: CHEMBL224725). So below I've looked into CHEMBL224725 first.
 
-Then I realise that if I search for "itraconazole" directly in ChEMBL, only four entries will appear with ChEMBL IDs of CHEMBL64391, CHEMBL22587, CHEMBL882 and CHEMBL5090785, and there is no ChEMBL224725. This is all due to a small spelling error (which is most likely a typo by accident) of itraconazole - being spelled as "itraconzole", which is also carried over into PubChem as well. I have double checked to make sure both "itraconzole" and the usual itraconazole are referring to the same chemical structure. Below are some screenshots showing the typo. ![Screenshot of "itraconzole" in ChEMBL database](chembl_itracon.png) ![Screenshot of "itraconzole" in PubChem that was inherited from ChEMBL](pubchem_itracon.png) 
+Then I realise that if I search for "itraconazole" directly in ChEMBL, only four entries will appear with ChEMBL IDs of CHEMBL64391, CHEMBL22587, CHEMBL882 and CHEMBL5090785, and there is no ChEMBL224725. This is all due to a small spelling error (which is most likely a typo by accident) of itraconazole - being spelled as "itraconzole", which is also carried over into PubChem as well. I have checked again to make sure both "itraconzole" and the usual itraconazole are referring to the same chemical structure. Below are some screenshots showing the typo. ![Screenshot of "itraconzole" in ChEMBL database](chembl_itracon.png) ![Screenshot of "itraconzole" in PubChem that was inherited from ChEMBL](pubchem_itracon.png) 
 
-So to add this likely-mis-spelled "itraconzole" into the dataframe, I literally add it into the SQL query above when obtaining drug information through chembl_downloader.
+So to add this likely-mis-spelled "itraconzole" into the dataframe, I literally just add it into the SQL query above when obtaining drug information through chembl_downloader.
 
 ```{python}
 # SMILES of new addition - "itraconzole"
@@ -419,7 +403,7 @@ itracon_5
 itracon_6
 ```
 
-Dataframe of df_3a4_s_inh_p containing 3 different itraconazoles is then updated below to remove two of the triplicated entries.
+Dataframe df_3a4_s_inh_p (the preprocessed strong CYP3A4 inhibitors) containing 3 different itraconazoles is then updated below to remove two of the triplicated entries.
 
 ```{python}
 # Preprocessed df of strong cyp3a4 inhibitors
@@ -433,6 +417,17 @@ I'm keeping the one with max phase marked as 4.0 (due to the other two having "N
 # Dropping itraconazole at index rows 4 & 6
 df_3a4_s_inh_p = df_3a4_s_inh_p.drop(labels = [4, 6])
 df_3a4_s_inh_p.head(10)
+```
+
+After cleaning up the duplicated structures, below are the full sets of strong and moderate CYP3A4 inhibitors for structural checking. 
+
+```{python}
+# strong cyp3a4 inhibitors
+Draw.MolsToGridImage(
+    df_3a4_s_inh_p["rdkit_mol"], 
+    molsPerRow=3, 
+    subImgSize=(400, 300), 
+    legends=list(df_3a4_s_inh_p["pref_name"]))
 ```
 
 ```{python}
@@ -449,13 +444,13 @@ Draw.MolsToGridImage(
 
 ##### **Maximum common substructures**
 
-MCS is something I'm interested in trying out so below are some examples of finding MCS in these CYP inhibitors.
+MCS is something I'm interested in trying out so below are some examples of finding MCS in these CYP inhibitors. Please note that MCS may not be the most suitable strategy to look at these CYP inhibitors, I'm only using it to become a bit more familiar with it so that I can better understand MCS.
 
 Some information regarding MCS in RDKit:
 
-* [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) is for 2 or more mols and returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
+* [FindMCS](https://rdkit.org/docs/source/rdkit.Chem.rdFMCS.html) is for 2 or more molecules and returns single-fragment MCS - based on FMCS algorithm [@dalke2013]
 
-* RascalMCES (maximum common edge substructures) is for 2 mols only and returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details
+* RascalMCES (maximum common edge substructures) is for 2 molecules only and returns multi-fragment MCES. A [RDKit blog post](https://greglandrum.github.io/rdkit-blog/posts/2023-11-08-introducingrascalmces.html) by Dave Cosgrove talks about this in more details
 
 Some code examples to refer to:
 
@@ -582,7 +577,7 @@ Draw.MolsToGridImage(
 It appears the MCS for most of them involves (partial) rings (e.g. cycloalkane, aromatic and macrolide ones). This result is basically not very different from when we've looked at the the CYP3A4 inhibitors separately in their moderate and strong potencies. The next thing I want to try is to add in the ring bonds matching.
 
 ```{python}
-# matching ring bonds (if any)
+# matching ring bonds
 all_3a4_mcs_ring = rdFMCS.FindMCS(mols_3a4_all, ringMatchesRingOnly=True)
 
 Draw.MolsToGridImage(
@@ -731,9 +726,7 @@ Draw.MolsToGridImage(
 
 By using the suggested class code above, the MCS has indeed become larger, where a full ring is highlighted as the MCS.
 
-[A second code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen is to highlight molecular differences, which is different from highlighting only the MCSes. Alternative URL link and more examples can be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences).
-
-Possible use cases of this code may be when dealing with a large set of analogues with changes in R-groups or during large compound screening and search (just as a few examples only). The main thing I can see from the code is that it begins with finding MCS for the input molecules, then use SMARTS strings of the MCS in order to find atoms not within the MCS (using [GetSubstructMatch()](https://rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.Mol.GetSubstructMatch) part) then highlight that part of the molecules.
+[A second code example](https://gist.github.com/iwatobipen/6d8708d8c77c615cfffbb89409be730d) from iwatobipen is to highlight molecular differences, which is different from highlighting only the MCSes. Alternative URL link and more examples can be accessed via [RDKit Cookbook](https://rdkit.org/docs/Cookbook.html#highlight-molecule-differences). Possible use cases of this code may be when dealing with a large set of analogues with changes in R-groups or during large compound screening and search (just as a few examples only). The main thing I can see from the code is that it begins with finding MCS for the input molecules, then uses SMARTS strings of the MCS in order to find atoms not within the MCS (using [GetSubstructMatch()](https://rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.Mol.GetSubstructMatch) part) then highlights that part of the molecules.
 
 <br>
 
@@ -752,7 +745,7 @@ df_2d6_all.head()
 ```{python}
 mols_all_2d6 = list(df_2d6_all["rdkit_mol"])
 
-# Find MCS for all CYP3A4 inhibitors
+# Find MCS for all CYP2D6 inhibitors
 all_2d6_mcs = rdFMCS.FindMCS(mols_all_2d6)
 
 # Get images of highlighted MCS for all CYP2D6 inhibitors
@@ -765,7 +758,7 @@ Draw.MolsToGridImage(
     )
 ```
 
-Again, ring structures are the MCS in the highlighted parts.
+Again, only ring structures are highlighted as the MCS.
 
 <br>
 
@@ -773,18 +766,20 @@ Again, ring structures are the MCS in the highlighted parts.
 
 Below are some of my small findings and thoughts.
 
-* As mentioned at the very top in the outline section, rings (heterocycles, aromatic or fused ones) are everywhere in the MCSes for CYP3A4 and CYP2D6 inhibitors
+* As mentioned at the very top in the outline section, rings (heterocycles, aromatic or fused ones) are everywhere in the MCSes for CYP3A4 and CYP2D6 inhibitors, and they are very common in known approved drugs
 
-* It may be a bit more interesting to compare the MCSes between CYP3A4 and CYP2D6 substrates (and even with the substrates for other CYPs)
+* Looking at CYP structures in relation to these inhibitors may be more meaningful and also may reveal more insights about possible binding sites or mechanisms of actions of CYP inhibitions for these compounds. This may also be further explored in parallel to the actual drug targets of these CYP inhibitors e.g. binding site on CYP isoenzyme versus binding site on drug target protein as there are different classes of drugs within these CYP inhibitors. For example, some of CYP2D6 inhibitors are drugs acting on central nervous system (about 9 out of 14 drugs) - e.g. bupropion, fluoxetine, paroxetine, clobazam, doxepin, duloxetine, locaserin, moclobemide and rolapitant. For the CYP3A4 inhibitors, they are in several different therapeutic classes e.g. antivirals, antifungals, antibacterials, kinase inhibitors etc.
 
-* Looking at CYP structures in relation to these inhibitors may be more meaningful and also may reveal more insights about possible binding sites or mechanisms of actions for these compounds. For example, some of CYP2D6 inhibitors are drugs acting on central nervous system (about 9 out of 14 drugs) - e.g. bupropion, fluoxetine, paroxetine, clobazam, doxepin, duloxetine, locaserin, moclobemide and rolapitant. For the CYP3A4 inhibitors, they are also in several different classes of drugs e.g. antivirals, antifungals, antibacterials, kinase inhibitors and so on.
+* It may be a bit more interesting to compare the MCSes between CYP3A4 and CYP2D6 substrates (adding in other substrates for other CYPs)
 
-* Future posts may involve looking at CYP substrates (other CYP inhibitors may also be looked at but most likely may lead to similar result as this one... however it may just be nice to confirm it)
+* Future posts may involve looking at CYP substrates using different cheminformatics strategies or doing molecular docking within a notebook setting (has this been done before?)
 
 * CYP inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects, so they may be looked at further down the line
+
+* MCS may not be absolutely useful in every scenario as I think it aims to look for the most maximum common substructures within a set of molecules, so not every molecule will be able to have a MCS shown (e.g. in a very diverse chemical sets), other similarity searching techniques should probably be used instead if needed
 
 <br>
 
 ##### **Acknowledgements**
 
-Thanks to every contributor, developer or authors of every software package used in this post, and also the online communities that are behind them. Also, before I forget, the thanks would also be extended to everyone who was involved in the relevant research journal papers mentioned in this post. Lastly, special thanks to Noel O'Boyle for being very patient with reading my awfully-long old draft earlier and pointed out some useful things to change (I kind of got lost when writing the draft... due to it being a "free-style post", I should avoid doing this again).
+Thanks to every contributor, developer or authors of every software package used in this post, and also the online communities behind them. Before I forget, the thanks would also be extended to the authors of the journal papers cited in this post. Lastly, special thanks to Noel O'Boyle for being very patient with reading my awfully-long old draft earlier and pointed out some useful things to note and change (I kind of got lost when writing the draft... due to it being a "free-style post", I should avoid doing this again).
