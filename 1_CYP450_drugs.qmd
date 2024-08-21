@@ -776,7 +776,7 @@ Below are some of my small findings and thoughts.
 
 * CYP inducers are a different story as they tend to increase drug metabolisms via CYP inductions, which are more likely to do with losing therapeutic effects than gaining adverse effects, so they may be looked at further down the line
 
-* MCS may not be absolutely useful in every scenario as I think it aims to look for the most maximum common substructures within a set of molecules, so not every molecule will be able to have a MCS shown (e.g. in a very diverse chemical sets), other similarity searching techniques should probably be used instead if needed
+* MCS may not be absolutely useful in every scenario as I think it aims to look for the most maximum common substructures within a set of molecules, so not every molecule will be able to have a MCS shown (e.g. in a very diverse chemical set), other similarity searching techniques should probably be used instead if needed
 
 <br>
 
